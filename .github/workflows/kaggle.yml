@@ -1,0 +1,52 @@
+name: kaggle
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Re-upload the package as a Kaggle Dataset (uses secrets)"
+        required: false
+        default: "false"
+  schedule:
+    - cron: "0 3 * * 0"
+
+jobs:
+  kaggle:
+    name: kaggle (scripts + tests, weekly; optional publish)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dev target
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: Format + lint (kaggle/ covered by repo-wide gates)
+        run: |
+          python -m black --check kaggle/
+          python -m isort --check-only --profile black kaggle/
+          python -m ruff check kaggle/
+      - name: Build offline archive
+        run: python kaggle/scripts/kaggle_dataset.py
+      - name: Smoke scripts
+        run: |
+          python kaggle/scripts/kaggle_hardware_detect.py
+          python kaggle/scripts/kaggle_benchmark.py
+          python kaggle/scripts/kaggle_train.py
+          python kaggle/scripts/kaggle_inference.py
+      - name: Kaggle tests
+        run: python -m pytest tests/test_kaggle_env.py tests/test_feather_v1_kaggle.py -q
+      - name: Publish dataset
+        if: github.event_name == 'workflow_dispatch' && inputs.publish == 'true'
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          python -m pip install kaggle
+          mkdir -p "$HOME/.kaggle" && umask 077 && \
+          echo "{\"username\":\"$KAGGLE_USERNAME\",\"key\":\"$KAGGLE_KEY\"}" > "$HOME/.kaggle/kaggle.json"
+          python -m kaggle datasets create -p models/kaggle \
+            || python -m kaggle datasets version -p models/kaggle

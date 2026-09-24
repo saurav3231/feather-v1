@@ -68,15 +68,16 @@ target-version = ["py38"]
 profile = "black"
 line_length = 88
 src_paths = ["src"]
-known_first_party = ["feather_v1", "tests"]
+known_first_party = ["feather_v1", "tests", "kaggle"]
 
 [tool.ruff]
 line-length = 88
 target-version = "py38"
-src = ["src", "tests", "scripts", "examples"]
+src = ["src", "tests", "scripts", "examples", "kaggle"]
+extend-exclude = ["*.ipynb"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["feather_v1", "tests"]
+known-first-party = ["feather_v1", "tests", "kaggle"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B"]

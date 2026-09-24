@@ -155,6 +155,25 @@ See `examples/quickstart.py`, `scripts/benchmark.py`, `scripts/train.py`.
 | 11 | Equilibrium hybrid | 90% memory saving |
 | 12 | Jacobi adaptive + Free Probability | 66% latency cut, Marchenko-Pastur optimal D |
 
+## Kaggle
+
+Feather v1 runs **CPU-only, no torch, no internet** in a Kaggle notebook. The
+`kaggle/` phase ships five ready-to-run configs, five scripts, five notebooks,
+and an offline archive (`kaggle_dataset.py` → `models/kaggle/`): numpy weights
+(`.pt`), spec-compliant **GGUF v3**, byte-level `tokenizer.json`, `config.json`
+and a single `feather-v1-kaggle.tar.gz` to upload as a Kaggle Dataset input.
+
+```bash
+python kaggle/scripts/kaggle_dataset.py      # build the archive
+python kaggle/scripts/kaggle_inference.py     # load it and decode bytes
+python kaggle/scripts/kaggle_benchmark.py     # measured tok/s + joules
+python kaggle/scripts/kaggle_train.py         # K-FAC readout (10x fewer steps)
+```
+
+Notebooks live in `kaggle/notebooks/`, details in `kaggle/README_KAGGLE.md`.
+A weekly `kaggle.yml` workflow (plus `workflow_dispatch`) rebuilds and can
+re-publish the dataset via `KAGGLE_USERNAME`/`KAGGLE_KEY` secrets.
+
 ## Repository structure
 
 ```
@@ -165,6 +184,7 @@ feather-v1/
 ├── requirements.txt        (runtime deps, mirrors [project].dependencies)
 ├── .gitignore
 ├── .github/workflows/ci.yml (lint + mypy per target + pytest matrix)
+├── .github/workflows/kaggle.yml (weekly rebuild + optional dataset publish)
 ├── src/feather_v1/
 │   ├── __init__.py         FeatherV1Model, __version__ = "1.0.0"
 │   ├── config.py           FeatherV1Config
@@ -178,8 +198,9 @@ feather-v1/
 │   ├── governor.py         Component 5 — Homeostasis Governor
 │   ├── generation.py       Component 6 — Generative Evolution
 │   └── model.py            FeatherV1Model end-to-end
-├── tests/                  (unit per component + integrated + 8 minors)
+├── tests/                  (unit per component + integrated + kaggle)
 ├── scripts/                benchmark.py, train.py
+├── kaggle/                 configs, scripts, notebooks, README_KAGGLE.md
 ├── docs/ARCHITECTURE.md    full theory + logic
 ├── configs/                i5_3337U.json, all_pcs.json
 └── examples/quickstart.py
@@ -188,7 +209,7 @@ feather-v1/
 ## Testing
 
 ```bash
-python -m black src/ tests/ scripts/ examples/ --check
+python -m black src/ tests/ scripts/ examples/ kaggle/ --check
 python -m isort --check-only --profile black .
 python -m ruff check .
 python -m mypy src

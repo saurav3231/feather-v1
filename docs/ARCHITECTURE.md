@@ -90,7 +90,11 @@ cpuid -> AVX-512+AMX: 10000-D (40KB L2), 8 binds/insn, 94 tok/s
 ```
 
 All components import `get_best_kernel()` from `hardware.py` — the fallback is
-automatic, nothing is hard-coded to a specific CPU.
+automatic, nothing is hard-coded to a specific CPU. `hardware.py` also detects
+the **Kaggle sandbox** (`is_kaggle()`, `kaggle_env()`), CUDA devices (via
+`nvidia-smi`, never torch) and internet reachability (`has_internet()`) — the
+same kernel negotiation drives the `kaggle/` phase, which runs CPU-only with no
+internet and no torch.
 
 ## 6. Energy Budget
 

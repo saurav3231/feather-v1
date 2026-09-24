@@ -468,3 +468,18 @@ def jacobi_update(candidates: np.ndarray, logits_fn, vocab: int = 100) -> np.nda
         out[k] = int(np.argmax(logits)) if logits.size > 0 else candidates[k]
     _ = vocab
     return out
+
+
+# ---------------------------------------------------------------------------
+# 13. Byte-level tokenizer (offline, zero deps) -- single source for Kaggle
+# ---------------------------------------------------------------------------
+def byte_tokenize(text: str) -> np.ndarray:
+    """UTF-8 byte-level tokenization into integer ids in ``[0, 255]``."""
+    if not text:
+        return np.empty(0, dtype=np.int64)
+    return np.frombuffer(text.encode("utf-8"), dtype=np.uint8).astype(np.int64)
+
+
+def byte_decode(ids: np.ndarray) -> str:
+    """Inverse of :func:`byte_tokenize` (ids in ``[0, 255]`` -> text)."""
+    return np.asarray(ids, dtype=np.uint8).tobytes().decode("utf-8", errors="replace")

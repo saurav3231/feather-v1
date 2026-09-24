@@ -15,6 +15,7 @@ with 512x memory saving and 64x fewer ops vs attention (see tests/).
 
 from __future__ import annotations
 
+import json
 from typing import Any
 
 import numpy as np
@@ -103,6 +104,10 @@ class FeatherV1Model:
             draft=np.repeat(self._argmax(protected), 4),
         )
 
+        token = int(drafts[-1]) if drafts.size else 0
+        nxt = np.zeros((1, self.config.dim))
+        nxt[0, token % self.config.dim] = 1.0
+
         self._states.append(
             {
                 "sensory": sensory_out,
@@ -112,6 +117,17 @@ class FeatherV1Model:
                 "protected": protected,
                 "drafts": drafts,
                 "entropy_gate_exited": gates,
+                "final_output": nxt,
+                "token": int(token),
+                "kernel": self.kernel,
+                "cache_info": {
+                    self.sensory.name: self.sensory.cache_report(),
+                    self.memory.name: self.memory.cache_report(),
+                    self.knowledge.name: self.knowledge.cache_report(),
+                    self.reasoning.name: self.reasoning.cache_report(),
+                    self.governor.name: self.governor.cache_report(),
+                    self.generation.name: self.generation.cache_report(),
+                },
             }
         )
         return self._states[-1]
@@ -160,6 +176,25 @@ class FeatherV1Model:
 
     def total_joules(self) -> float:
         return self.energy.total()
+
+    def save_weights(self, path: str) -> None:
+        """Export config + projection for offline packaging (exact path)."""
+        with open(path, "wb") as fh:
+            np.savez(
+                fh,
+                config=json.dumps(self.config.to_dict()).encode("utf-8"),
+                logit_projection=self._logit_projection,
+            )
+
+    @classmethod
+    def from_weights(cls, path: str, config_path: str | None = None) -> FeatherV1Model:
+        """Rebuild a model from :meth:`save_weights` output (offline-safe)."""
+        data = np.load(path, allow_pickle=False)
+        cfg = json.loads(bytes(data["config"]).decode("utf-8"))
+        model = cls(FeatherV1Config.from_dict(cfg), config_path)
+        if "logit_projection" in data.files:
+            model._logit_projection = np.asarray(data["logit_projection"])
+        return model
 
     def states(self) -> list:
         return self._states

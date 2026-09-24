@@ -8,7 +8,13 @@ from .base import BaseComponent
 from .config import FeatherV1Config
 from .generation import GenerativeEvolution
 from .governor import HomeostasisGovernor
-from .hardware import detect_cpu_features, get_best_kernel
+from .hardware import (
+    cuda_device_summary,
+    detect_cpu_features,
+    get_best_kernel,
+    is_kaggle,
+    kaggle_env,
+)
 from .knowledge import KnowledgeVault
 from .memory import LiquidMemory
 from .model import EnergyTracker, FeatherV1Model
@@ -29,5 +35,8 @@ __all__ = [
     "EnergyTracker",
     "get_best_kernel",
     "detect_cpu_features",
+    "is_kaggle",
+    "kaggle_env",
+    "cuda_device_summary",
     "__version__",
 ]

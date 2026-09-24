@@ -1,0 +1,7 @@
+# Kaggle notebook extra requirements (feather-v1 installs from the repo itself:
+#   pip install -e /kaggle/working  --or-->  pip install feather-v1)
+numpy>=1.26.0
+py-cpuinfo>=8.0.0
+
+# Optional: only needed for the energy-surface and K-FAC curve cells
+matplotlib>=3.8
