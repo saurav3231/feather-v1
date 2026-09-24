@@ -1,0 +1,97 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "feather-v1"
+version = "1.0.0"
+description = "Feather v1 — CPU-native 200-year open source revolution LLM engine. 6 components, 12 advanced maths, hardware-adaptive (AVX-512 -> AVX2 -> AVX -> NEON -> Scalar)."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+keywords = [
+    "llm",
+    "cpu-native",
+    "hyperdimensional",
+    "fractional-calculus",
+    "tropical",
+    "p-adic",
+    "open-source",
+    "feather",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "numpy>=1.21",
+    "py-cpuinfo>=8.0.0",
+]
+
+[project.optional-dependencies]
+main = []
+torch = ["torch>=1.13"]
+cuda = ["torch>=1.13"]
+energy = ["codecarbon>=2.0.0"]
+minimum_versions = [
+    "numpy==1.21.0; python_version < '3.11'",
+    "numpy==1.23.5; python_version >= '3.11' and python_version < '3.12'",
+    "numpy==1.26.0; python_version >= '3.12'",
+    "py-cpuinfo==8.0.0",
+]
+dev = [
+    "black",
+    "isort",
+    "pytest",
+    "ruff",
+    "mypy",
+    "torch>=1.13",
+    "codecarbon>=2.0.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 88
+target-version = ["py38"]
+
+[tool.isort]
+profile = "black"
+line_length = 88
+src_paths = ["src"]
+known_first_party = ["feather_v1", "tests"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py38"
+src = ["src", "tests", "scripts", "examples"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["feather_v1", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["E501", "B008", "UP007"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+
+[tool.mypy]
+python_version = "3.10"
+files = ["src"]
+no_implicit_optional = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = ["numpy._core._multiarray_umath", "numpy.core._multiarray_umath"]
+ignore_missing_imports = true

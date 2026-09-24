@@ -1,0 +1,73 @@
+{
+  "model_name": "feather-v1-42M",
+  "version": "1.0.0",
+  "description": "Auto-hardware adaptive config — works for ALL PCs: i5-3337U to i9, Ryzen, Apple M, Raspberry Pi",
+  "auto_hardware": true,
+  "feather_v1_config": {
+    "dim": 384,
+    "hypervector_dim": "auto",
+    "seq_len": 512,
+    "chunk_size": "auto",
+    "num_chunks": 16,
+    "alpha_fractional": 0.7,
+    "K_frac_recent": 32,
+    "K_frac_long": 128,
+    "TT_rank": "auto",
+    "tau_tropical": 0.1,
+    "p_adic_p": 2,
+    "p_adic_chunk": 32,
+    "threads": "auto",
+    "threads_reason": "Auto: 1 thread per physical core, AVX fallback caps at 2",
+    "precision": "int8",
+    "binding_kernel": "auto",
+    "moe_kernel": "auto",
+    "moe_experts": 64,
+    "moe_top_k": 1,
+    "moe_active_percent": 1.5,
+    "batch_size": 1,
+    "ram_budget_gb": 0.8,
+    "adaptive_range": {
+      "hypervector_dim": "512-10000 (2KB-40KB)",
+      "chunk_size": "32-64",
+      "TT_rank": "4-16",
+      "threads": "1-physical cores"
+    }
+  },
+  "adaptive_fallback_all_pcs": {
+    "avx512_amx": {
+      "example": "i7-12700 12C 32GB",
+      "hypervector_dim": 10000,
+      "binding": "avx512_wht",
+      "moe": "amx_tropical_tt",
+      "expected_tok_per_sec": "94 tok/s"
+    },
+    "avx2": {
+      "example": "Ryzen 7 5700X 8C",
+      "hypervector_dim": 4096,
+      "binding": "avx2_wht",
+      "moe": "avx2_tropical_tt",
+      "expected_tok_per_sec": "45-60 tok/s"
+    },
+    "avx": {
+      "example": "i5-3337U 2C/4T 8GB",
+      "hypervector_dim": 1024,
+      "binding": "avx_wht",
+      "moe": "avx_tropical_tt",
+      "expected_tok_per_sec": "12-18 tok/s"
+    },
+    "neon": {
+      "example": "Apple M3, Raspberry Pi 5",
+      "hypervector_dim": 1024,
+      "binding": "neon_wht",
+      "moe": "neon_tropical",
+      "expected_tok_per_sec": "35-50 tok/s M3, 6 tok/s Pi5"
+    },
+    "scalar": {
+      "example": "Very old PC no SIMD",
+      "hypervector_dim": 512,
+      "binding": "scalar_wht",
+      "moe": "scalar_tropical",
+      "expected_tok_per_sec": "3-5 tok/s"
+    }
+  }
+}

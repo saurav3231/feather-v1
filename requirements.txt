@@ -1,0 +1,2 @@
+numpy>=1.21
+py-cpuinfo>=8.0.0

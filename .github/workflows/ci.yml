@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Dependency targets (installed via pip install -e ".[target]"):
+#   main             - runtime only (numpy, py-cpuinfo)
+#   minimum_versions - pinned floor of every runtime dependency
+#   cuda             - GPU-capable torch build (CPU wheel installs on runners;
+#                      feather-v1 is CPU-native so CUDA kernels are never used)
+#   dev              - default: lint/type/test tools + all optional runtime
+#
+# Formatting/import/lint checks are target-independent and run once on dev.
+# Type checking and tests run against every target so version-sensitive
+# stubs (e.g. numpy floor vs numpy latest) are covered.
+
+jobs:
+  lint:
+    name: lint (black + isort + ruff, dev target)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dev target
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: Black format check
+        run: python -m black --check .
+      - name: Isort check
+        run: python -m isort --check-only --profile black .
+      - name: Ruff lint
+        run: python -m ruff check .
+
+  typecheck:
+    name: mypy (${{ matrix.target }} on py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: "main", python-version: "3.12" }
+          - { target: "minimum_versions", python-version: "3.10" }
+          - { target: "cuda", python-version: "3.12" }
+          - { target: "dev", python-version: "3.12" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install ${{ matrix.target }} target + mypy
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[${{ matrix.target }}]"
+          python -m pip install mypy
+      - name: mypy
+        run: python -m mypy src
+
+  test:
+    name: pytest (${{ matrix.target }} on py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.8", "3.10", "3.12"]
+        target: ["main", "dev"]
+        include:
+          - { python-version: "3.10", target: "minimum_versions" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install ${{ matrix.target }} target + pytest
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[${{ matrix.target }}]"
+          python -m pip install pytest
+      - name: pytest
+        run: python -m pytest tests/ -v
