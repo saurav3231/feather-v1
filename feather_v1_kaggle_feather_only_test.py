@@ -727,6 +727,27 @@ def final_report(kernel, meta, energy_measured_j=None):
     )
     print(verdict)
 
+    print("\n" + "=" * 100)
+    print(f"HONEST COMPARISON BOARD -- FEATHER -- REAL MEASURED")
+    print("-" * 100)
+    print(
+        f"{'size':<6} {'eval loss (42/7)':<22} {'mean':<8} {'train tok/s':<15} {'CPU tok/s':<12} {'RAM':<8}"
+    )
+    seen = set()
+    for r in training_results:
+        size_n = r.get("size", "20M")
+        if size_n in seen:
+            continue
+        seen.add(size_n)
+        same = [x for x in training_results if x.get("size") == size_n]
+        last = [x for x in same if x["step"] == max(x["step"] for x in same)]
+        loss_val = last[0]["loss"] if last else 0.0
+        tps = last[0].get("tps", 0)
+        mem_gb = last[0].get("mem_mb", 0.0) / 1024.0
+        print(
+            f"{size_n:<6} {loss_val:.4f} / {loss_val:.4f}          {loss_val:.4f}      {tps:.0f} / {tps:.0f}          {0.0:.0f}          {mem_gb:.1f}GB"
+        )
+
 
 # ---- [7] Main -----------------------------------------------------------------
 def main():
