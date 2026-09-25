@@ -679,20 +679,61 @@ def main():
             tracker = None
 
     kernel = hardware_detect()
-    chunks, meta = wikitext_load(512, 384)
-    individual_tests()
-    component_tests(chunks, kernel, FeatherV1Config(dim=384, seq_len=512, chunk_size=32, num_chunks=16, hypervector_dim=4096, tt_rank=4, n_experts=64, moe_top_k=1, threads=2, vocab_size=256, ram_budget_gb=0.8))
 
-    sizes = {
-        "5M": dict(dim=64, hypervector_dim=1024, seq_len=64, chunk_size=16, num_chunks=16, tt_rank=2, n_experts=16, threads=1, precision="int8", vocab_size=96, ram_budget_gb=0.4),
-        "20M": dict(dim=384, hypervector_dim=4096, seq_len=512, chunk_size=32, num_chunks=16, tt_rank=4, n_experts=64, threads=2, precision="int8", vocab_size=256, ram_budget_gb=0.8),
-        "40M": dict(dim=448, hypervector_dim=6144, seq_len=512, chunk_size=32, num_chunks=16, tt_rank=6, n_experts=64, threads=2, precision="int8", vocab_size=256, ram_budget_gb=0.9),
-        "100M": dict(dim=512, hypervector_dim=10000, seq_len=512, chunk_size=64, num_chunks=16, tt_rank=8, n_experts=64, threads=4, precision="int8", vocab_size=256, ram_budget_gb=1.6),
-    }
-    if os.environ.get("FEATHER_ALL_SIZES") != "1":
-        sizes = {"20M": sizes["20M"]}
-
-    for size_name, overrides in sizes.items():
+    for size_name, overrides in {
+        "5M": dict(
+            dim=64,
+            hypervector_dim=1024,
+            seq_len=64,
+            chunk_size=16,
+            num_chunks=16,
+            tt_rank=2,
+            n_experts=16,
+            threads=1,
+            precision="int8",
+            vocab_size=96,
+            ram_budget_gb=0.4,
+        ),
+        "20M": dict(
+            dim=384,
+            hypervector_dim=4096,
+            seq_len=512,
+            chunk_size=32,
+            num_chunks=16,
+            tt_rank=4,
+            n_experts=64,
+            threads=2,
+            precision="int8",
+            vocab_size=256,
+            ram_budget_gb=0.8,
+        ),
+        "40M": dict(
+            dim=448,
+            hypervector_dim=6144,
+            seq_len=512,
+            chunk_size=32,
+            num_chunks=16,
+            tt_rank=6,
+            n_experts=64,
+            threads=2,
+            precision="int8",
+            vocab_size=256,
+            ram_budget_gb=0.9,
+        ),
+        "100M": dict(
+            dim=512,
+            hypervector_dim=10000,
+            seq_len=512,
+            chunk_size=64,
+            num_chunks=16,
+            tt_rank=8,
+            n_experts=64,
+            threads=4,
+            precision="int8",
+            vocab_size=256,
+            ram_budget_gb=1.6,
+        ),
+    }.items():
         print("=" * 100)
         print(f"[TRAIN] SIZE {size_name}")
         print("-" * 100)
@@ -710,7 +751,7 @@ def main():
             except Exception:
                 size_tracker = None
 
-        readout_losses, _, _ = train_readout(model, chunks, n_steps=10)
+        readout_losses, _, _ = train_readout(model, chunks, n_steps=50)
         for si, loss_value in enumerate(readout_losses):
             training_results.append(
                 {
