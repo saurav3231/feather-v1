@@ -183,7 +183,7 @@ def main():
     mode = "char" if vocab <= 96 else "byte"
     data = load_wikitext2("train", mode, seq_len, dim)
     chunks = data["chunks"]
-    ids = data["ids"].reshape(-1, seq_len)
+    ids = data["ids"][: len(chunks) * seq_len].reshape(-1, seq_len)
     print(f"Data: {ids.shape[0]} chunks x {seq_len} = {ids.size:,} tokens")
 
     train_tensors = torch.from_numpy(ids).long()
