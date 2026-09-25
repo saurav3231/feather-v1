@@ -1,0 +1,30 @@
+{
+  "model_name": "feather-v1-5M",
+  "version": "1.0.0",
+  "description": "Feather v1 5M real model - char-level vocab 96 (real WikiText-2 data) - dim 64 hv 1024 seq 64 chunk 16 TT 2 moe 16 int8",
+  "auto_hardware": true,
+  "feather_v1_config": {
+    "dim": 64,
+    "hypervector_dim": 1024,
+    "seq_len": 64,
+    "chunk_size": 16,
+    "num_chunks": 16,
+    "alpha_fractional": 0.7,
+    "K_frac_recent": 32,
+    "K_frac_long": 128,
+    "TT_rank": 2,
+    "tau_tropical": 0.1,
+    "p_adic_p": 2,
+    "p_adic_chunk": 32,
+    "threads": 1,
+    "precision": "int8",
+    "binding_kernel": "auto",
+    "moe_kernel": "auto",
+    "moe_experts": 16,
+    "moe_top_k": 1,
+    "batch_size": 1,
+    "ram_budget_gb": 0.4,
+    "seed": 42,
+    "vocab_size": 96
+  }
+}

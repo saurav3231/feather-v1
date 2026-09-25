@@ -62,6 +62,7 @@ venv.bak/
 # Model files
 *.gguf
 models/
+checkpoints/
 
 # Release artifacts ARE committed (GGUF + binaries under release/ are the
 # v1.0.0 distribution), so carve them out of the model-file ignore rules.
@@ -87,3 +88,6 @@ models/
 # codecarbon
 emissions*.csv
 emissions/
+feather_v1_opt3_train_real_report.json
+# synthetic GGUF backups
+release/v1.0.0/*.synthetic.gguf

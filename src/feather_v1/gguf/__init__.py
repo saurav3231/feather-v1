@@ -17,6 +17,7 @@ from .reader import (
     npz_round_trip,
     read_gguf,
 )
+from .real import REAL_METADATA_KEYS, build_real_gguf
 from .writer import (
     QUANTIZERS,
     PackedTensor,
@@ -32,6 +33,8 @@ __all__ = [
     "GGUFTensor",
     "PackedTensor",
     "QUANTIZERS",
+    "REAL_METADATA_KEYS",
+    "build_real_gguf",
     "convert_pt_to_gguf",
     "f16_pack",
     "f32_pack",

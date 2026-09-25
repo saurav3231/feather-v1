@@ -256,13 +256,24 @@ def wikitext_lines() -> tuple[list[str], str]:
     """Load real WikiText-2 medium scale (never synthetic, fail loudly).
 
     Sources in order:
-      1. Kaggle input files (wiki.train.raw / wiki.train.tokens)
-      2. huggingface datasets -- namespaced repo (datasets>=5) then legacy
+      1. feather_v1.data shipped corpus (fresh clone, no /kaggle/input needed)
+      2. Kaggle input files (wiki.train.raw / wiki.train.tokens)
+      3. huggingface datasets -- namespaced repo (datasets>=5) then legacy
     Raises RuntimeError if no real WikiText corpus can be fetched so the run
     never trains on fake data.
     """
+    try:
+        from feather_v1.data.wikitext2 import load_lines as _load_lines
+
+        lines = _load_lines("train")
+        if lines:
+            print("WikiText source: feather_v1.data shipped corpus")
+            return lines, "feather_v1.data/wikitext-2-raw-v1"
+    except Exception as exc:  # pragma: no cover
+        print(f"in-repo corpus load failed: {exc}")
     file_candidates = [
         "/kaggle/input/wikitext/wikitext-2-raw/wiki.train.raw",
+        "/kaggle/input/wikitext/wiki.train.tokens",
         "/kaggle/input/wikitext-2/wiki.train.tokens",
         "/kaggle/working/wikitext-2-raw/wiki.train.raw",
         "wikitext-2-raw/wiki.train.raw",

@@ -1,0 +1,30 @@
+{
+  "model_name": "feather-v1-100M",
+  "version": "1.0.0",
+  "description": "Feather v1 100M real model - byte-level vocab 256 (real WikiText-2 data) - dim 512 hv 10000 seq 512 chunk 64 TT 8 moe 64 int8",
+  "auto_hardware": true,
+  "feather_v1_config": {
+    "dim": 512,
+    "hypervector_dim": 10000,
+    "seq_len": 512,
+    "chunk_size": 64,
+    "num_chunks": 16,
+    "alpha_fractional": 0.7,
+    "K_frac_recent": 32,
+    "K_frac_long": 128,
+    "TT_rank": 8,
+    "tau_tropical": 0.1,
+    "p_adic_p": 2,
+    "p_adic_chunk": 32,
+    "threads": 4,
+    "precision": "int8",
+    "binding_kernel": "auto",
+    "moe_kernel": "auto",
+    "moe_experts": 64,
+    "moe_top_k": 1,
+    "batch_size": 1,
+    "ram_budget_gb": 1.6,
+    "seed": 42,
+    "vocab_size": 256
+  }
+}

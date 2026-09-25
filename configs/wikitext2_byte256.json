@@ -1,0 +1,30 @@
+{
+  "model_name": "feather-v1-wikitext2-byte256",
+  "version": "1.0.0",
+  "description": "WikiText-2 byte-level vocab 256 (utf-8 bytes) — model vocab sized 256 from real data source",
+  "auto_hardware": true,
+  "feather_v1_config": {
+    "dim": 384,
+    "hypervector_dim": "auto",
+    "seq_len": 512,
+    "chunk_size": "auto",
+    "num_chunks": 16,
+    "alpha_fractional": 0.7,
+    "K_frac_recent": 32,
+    "K_frac_long": 128,
+    "TT_rank": "auto",
+    "tau_tropical": 0.1,
+    "p_adic_p": 2,
+    "p_adic_chunk": 32,
+    "threads": "auto",
+    "precision": "int8",
+    "binding_kernel": "auto",
+    "moe_kernel": "auto",
+    "moe_experts": 64,
+    "moe_top_k": 1,
+    "batch_size": 1,
+    "ram_budget_gb": 0.8,
+    "seed": 42,
+    "vocab_size": 256
+  }
+}
