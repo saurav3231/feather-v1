@@ -1,0 +1,11 @@
+services:
+  feather:
+    build: .
+    container_name: feather-v1
+    ports:
+      - "8000:8000"
+    environment:
+      FEATHER_MODEL: /app/model.pt
+    mem_limit: 2g
+    cpus: 2
+    restart: unless-stopped

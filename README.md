@@ -6,6 +6,10 @@
 [![CPU-only](https://img.shields.io/badge/CPU-only-green.svg)](#hardware-adaptive-)
 [![94 tok/s](https://img.shields.io/badge/94%20tok%2Fs-CPU-purple.svg)](#hardware-adaptive-)
 [![CI](https://img.shields.io/badge/CI-black%2Bisort%2Bruff%2Bmypy%2Bpytest-blueviolet.svg)](.github/workflows/ci.yml)
+[![HuggingFace](https://img.shields.io/badge/%F0%9F%A4%97-HuggingFace-FFD21E)](https://huggingface.co/saurav3231/feather-v1)
+[![Ollama](https://img.shields.io/badge/Ollama-feather--v1-black)](https://ollama.com/saurav3231/feather-v1)
+[![PyPI](https://img.shields.io/badge/PyPI-feather--v1-3775A9)](https://pypi.org/project/feather-v1/)
+[![Docker](https://img.shields.io/badge/Docker-feather--v1-2496ED)](https://hub.docker.com/r/saurav3231/feather-v1)
 
 **Feather v1** — the CPU-native 200-year open source revolution LLM engine.
 
@@ -250,3 +254,42 @@ Fractional, p-adic, Sheaf — are discovered, not invented. They survive every
 change of hardware.
 
 **Designed 2026-09-24 in Pokhara for 2226.**
+
+---
+
+## Distribution (HF / Ollama / GGUF / pip / Docker / offline)
+
+Feather v1 ships five ways; the numpy engine is the same everywhere.
+
+| Path | Command | Audience |
+|------|---------|----------|
+| **pip** | `pip install feather-v1` | developers, analytics |
+| **HuggingFace** | `AutoModelForCausalLM.from_pretrained("saurav3231/feather-v1")` | transformers users |
+| **Ollama / llama.cpp** | `ollama run feather-v1 "namaste, xasan"` | desktop chat |
+| **Docker** | `docker compose up --build` then `POST /completion` | servers, edge |
+| **Offline** | `python scripts/offline_installer.py` + `install.sh` | air-gapped / airplane mode |
+
+Quickstart:
+
+```bash
+pip install feather-v1                      # numpy engine
+python - <<'EOF'
+from feather_v1 import FeatherV1Model
+from feather_v1.utils import byte_tokenize
+m = FeatherV1Model.from_weights("models/kaggle/feather-v1-kaggle.pt")
+tok = byte_tokenize("namaste, xasan")
+out = m.generate(tok, steps=16)
+print(bytes(int(b) for b in out).decode("utf-8", errors="replace"))
+EOF
+
+python scripts/gguf_convert.py --quant q8_0  # weights -> GGUF v3 (q8_0 verified)
+python scripts/hf_upload.py --build-only      # builds dist/hf bundle
+python scripts/ollama_publish.py              # needs the `ollama` CLI
+python scripts/offline_installer.py           # builds the air-gap tarball
+```
+
+Details: [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md) and
+[docs/HF_OLLAMA.md](docs/HF_OLLAMA.md). GGUF files are GGUF v3 (24-byte
+header, 32-aligned data); `F16` / `Q8_0` are llama.cpp byte-compatible and
+verified locally, `Q4_K_M` (2-bit index) round-trips through the feather reader
+and awaits llama.cpp byte validation on a machine with the binary.

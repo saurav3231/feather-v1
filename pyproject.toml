@@ -41,6 +41,20 @@ main = []
 torch = ["torch>=1.13"]
 cuda = ["torch>=1.13"]
 energy = ["codecarbon>=2.0.0"]
+hf = [
+    "torch>=1.13",
+    "transformers>=4.40",
+    "huggingface_hub>=0.23",
+]
+gguf = [
+    "numpy>=1.21",
+    "py-cpuinfo>=8.0.0",
+]
+ollama = [
+    "numpy>=1.21",
+    "py-cpuinfo>=8.0.0",
+]
+serve = ["flask>=2.2"]
 minimum_versions = [
     "numpy==1.21.4; python_version < '3.11'",
     "numpy==1.23.5; python_version >= '3.11' and python_version < '3.12'",
@@ -54,6 +68,9 @@ dev = [
     "ruff",
     "mypy",
     "torch>=1.13",
+    "transformers>=4.40",
+    "huggingface_hub>=0.23",
+    "flask>=2.2",
     "codecarbon>=2.0.0",
 ]
 
@@ -96,3 +113,9 @@ show_error_codes = true
 [[tool.mypy.overrides]]
 module = ["numpy._core._multiarray_umath", "numpy.core._multiarray_umath"]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["feather_v1.hf.*"]
+# transformers/torch ship incomplete stubs; the HF layer is an optional
+# container shim around the strictly-typed numpy engine (feather_v1 core).
+ignore_errors = true

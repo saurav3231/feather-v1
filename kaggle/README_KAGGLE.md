@@ -59,6 +59,17 @@ resolve `/kaggle/input/feather-v1-model/feather-v1-kaggle/...` unchanged.
 3. `pip install -e /kaggle/working` (this repo) or `pip install feather-v1`.
 4. Run cells — no internet, no torch.
 
+## Distributing beyond Kaggle
+
+The distribution phase turns this Kaggle-phase archive into production
+channels -- see [docs/DISTRIBUTION.md](../docs/DISTRIBUTION.md):
+
+- `scripts/gguf_convert.py` quantizes `feather-v1-kaggle.pt` into GGUF v3
+  (`f16`, `q8_0` verified; `q4_k_m` documented) for Ollama / llama.cpp.
+- `scripts/hf_upload.py` exports the same weights as a HuggingFace
+  `from_pretrained` bundle (`saurav3231/feather-v1`).
+- `scripts/offline_installer.py` packs the air-gap tarball with the wheel.
+
 ## Publishing from CI
 
 `.github/workflows/kaggle.yml` runs every Sunday and on `workflow_dispatch`.
