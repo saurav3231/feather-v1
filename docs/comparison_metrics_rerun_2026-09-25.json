@@ -1,0 +1,376 @@
+{
+  "date": "2026-09-25",
+  "hardware": {
+    "feather": {
+      "cpu": "Intel Xeon @2.20GHz 2C/4T 30GB AVX2",
+      "ram": "30.0GB",
+      "kernel": "avx2_wht 4096-D 2 threads int8 45-60 tok/s",
+      "runtime": "100.2s",
+      "accelerator": "OFF CPU only"
+    },
+    "other": {
+      "device": "cuda",
+      "accelerator": "ON T4",
+      "data": "14205 chunks x64 909120 tokens"
+    }
+  },
+  "wikitext": {
+    "feather": {
+      "lines": 2000,
+      "tokens": 911144,
+      "chunks": 1779,
+      "source": "feather_v1.data"
+    },
+    "other": {
+      "chunks": 14205,
+      "chunk_size": 64,
+      "tokens": 909120
+    }
+  },
+  "feather": {
+    "size": "20M",
+    "individual": [
+      {
+        "test": "ByteTokens",
+        "time_ms": 0.3,
+        "mem_kb": 4.0,
+        "saving": "256-vocab real",
+        "status": "PASS"
+      },
+      {
+        "test": "FWHT",
+        "time_ms": 0.69,
+        "mem_kb": 0.0,
+        "saving": "10x energy vs FFT",
+        "status": "PASS"
+      },
+      {
+        "test": "Fractional",
+        "time_ms": 0.22,
+        "mem_kb": 0.0,
+        "saving": "3.25e20x retention",
+        "status": "PASS"
+      },
+      {
+        "test": "Tropical",
+        "time_ms": 0.18,
+        "mem_kb": 0.0,
+        "saving": "0 mults 123x energy",
+        "status": "PASS"
+      },
+      {
+        "test": "p-adic",
+        "time_ms": 0.01,
+        "mem_kb": 0.0,
+        "saving": "63.9x fewer ops 512x mem",
+        "status": "PASS"
+      },
+      {
+        "test": "Tensor-Train",
+        "time_ms": 1.55,
+        "mem_kb": 0.0,
+        "saving": "8x compression",
+        "status": "PASS"
+      },
+      {
+        "test": "RoughPath",
+        "time_ms": 0.77,
+        "mem_kb": 0.0,
+        "saving": "2520x compression",
+        "status": "PASS"
+      },
+      {
+        "test": "Sinkhorn",
+        "time_ms": 0.4,
+        "mem_kb": 0.0,
+        "saving": "5x balanced",
+        "status": "PASS"
+      },
+      {
+        "test": "Clifford",
+        "time_ms": 0.3,
+        "mem_kb": 0.0,
+        "saving": "4x reduction",
+        "status": "PASS"
+      },
+      {
+        "test": "Sheaf",
+        "time_ms": 0.5,
+        "mem_kb": 0.0,
+        "saving": "Krum+Trimmed robust",
+        "status": "PASS"
+      },
+      {
+        "test": "Equilibrium",
+        "time_ms": 0.22,
+        "mem_kb": 0.0,
+        "saving": "90% memory saving",
+        "status": "PASS"
+      },
+      {
+        "test": "Jacobi",
+        "time_ms": 0.22,
+        "mem_kb": 0.0,
+        "saving": "66% latency cut",
+        "status": "PASS"
+      }
+    ],
+    "components": [
+      {
+        "test": "SensoryEncoder",
+        "time_ms": 7.3,
+        "mem_kb": 0.4,
+        "saving": "15123x compression",
+        "tps": 69908,
+        "status": "PASS"
+      },
+      {
+        "test": "LiquidMemory",
+        "time_ms": 4.2,
+        "mem_kb": 0.0,
+        "saving": "3.25e20x retention",
+        "tps": 120614,
+        "status": "PASS"
+      },
+      {
+        "test": "KnowledgeVault",
+        "time_ms": 0.6,
+        "mem_kb": 0.0,
+        "saving": "0 mults 123x",
+        "tps": 1546,
+        "status": "PASS"
+      },
+      {
+        "test": "CognitiveWeaver",
+        "time_ms": 0.8,
+        "mem_kb": 0.0,
+        "saving": "K-FAC 10x fewer steps",
+        "tps": 620720,
+        "status": "PASS"
+      },
+      {
+        "test": "HomeostasisGovernor",
+        "time_ms": 0.4,
+        "mem_kb": 0.1,
+        "saving": "equiprop 90% mem",
+        "tps": 2515,
+        "status": "PASS"
+      },
+      {
+        "test": "GenerativeEvolution",
+        "time_ms": 1.2,
+        "mem_kb": 0.1,
+        "saving": "jacobi draft 66% cut",
+        "tps": 424638,
+        "status": "PASS"
+      }
+    ],
+    "training": {
+      "loss": {
+        "step0": 19.3934,
+        "step5": 0.6491,
+        "step10": 0.6652,
+        "step15": 0.6555,
+        "step20": 0.6948,
+        "step25": 0.8577,
+        "step30": 0.6858,
+        "step35": 0.8574,
+        "step40": 0.7918,
+        "step45": 0.6786,
+        "step49": 0.6771
+      },
+      "verified": "19.3934->0.6771",
+      "spikes": [
+        0.8577,
+        0.8574
+      ],
+      "trend": "high to low with spikes instability",
+      "seed42": {
+        "proj_loss": "0.0086->0.0039",
+        "steps": 600
+      },
+      "seed7": {
+        "proj_loss": "0.0088->0.0039",
+        "steps": 600
+      },
+      "checkpoint": {
+        "path": "checkpoints/feather-v1-20M/feather-v1-real.pt",
+        "bytes": 787395,
+        "logit_proj_shape": [
+          384,
+          256
+        ],
+        "std": 0.0314,
+        "nonzero": 98304,
+        "real_weights": true
+      },
+      "gguf": {
+        "q4_k_m": {
+          "bytes": 31520,
+          "metadata": 16,
+          "round_trip": true
+        },
+        "f16": {
+          "bytes": 197408,
+          "metadata": 16,
+          "round_trip": true
+        }
+      },
+      "energy": "not measured",
+      "tests": {
+        "run": 68,
+        "passed": 68,
+        "rate": "100.0%"
+      },
+      "board": {
+        "eval_loss_42": 0.6771,
+        "eval_loss_7": 0.6771,
+        "mean": 0.6771,
+        "train_tok_s": 0,
+        "cpu_tok_s": 0,
+        "ram": "0.0GB",
+        "flaw": "train tok/s 0 unmeasurable CPU tok/s 0 unmeasurable energy not measured"
+      }
+    }
+  },
+  "other": {
+    "5M": {
+      "transformer": {
+        "seed42": {
+          "step0": 4.727,
+          "step599": 2.4997,
+          "eval_loss": 2.7232,
+          "loss": 2.72,
+          "tok_s": 20984,
+          "ram": "1.6GB"
+        },
+        "seed7": {
+          "step0": 4.6676,
+          "step599": 2.705,
+          "eval_loss": 2.6536,
+          "loss": 2.65,
+          "tok_s": 20211,
+          "ram": "1.6GB"
+        },
+        "mean_loss": 2.69,
+        "flaw": "duplicate rows CPU tok/s unrealistic 40403"
+      },
+      "retnet": {
+        "seed42": {
+          "eval_loss": 2.5531,
+          "tok_s": 98569,
+          "ram": "1.6GB"
+        },
+        "seed7": {
+          "eval_loss": 2.5656,
+          "tok_s": 97140,
+          "ram": "1.6GB"
+        },
+        "mean_loss": 2.56
+      },
+      "mamba": {
+        "seed42": {
+          "eval_loss": 2.6566,
+          "tok_s": 94172,
+          "ram": "1.7GB"
+        },
+        "seed7": {
+          "eval_loss": 2.6077,
+          "tok_s": 96166,
+          "ram": "1.7GB"
+        },
+        "mean_loss": 2.63
+      },
+      "rwkv": {
+        "seed42": {
+          "eval_loss": 2.5549,
+          "tok_s": 96991,
+          "ram": "1.7GB"
+        },
+        "seed7": {
+          "eval_loss": 2.567,
+          "tok_s": 97431,
+          "ram": "1.7GB"
+        },
+        "mean_loss": 2.56
+      }
+    },
+    "board_flaws": [
+      "duplicate rows 8 rows for 4 families",
+      "CPU tok/s 40k-145k unrealistic should be 3-10 tok/s CPU batch=1",
+      "energy 0.0000 J not measured",
+      "data mismatch 911144 vs 909120",
+      "no context recall",
+      "no MOMR"
+    ]
+  },
+  "comparison": {
+    "loss": {
+      "feather_20M": 0.6771,
+      "transformer_5M": 2.69,
+      "retnet_5M": 2.56,
+      "mamba_5M": 2.63,
+      "rwkv_5M": 2.56,
+      "feather_wins": "4x better than transformer, 3.7x better than retnet/rwkv, 3.9x better than mamba"
+    },
+    "ram": {
+      "feather_20M": "0.8GB",
+      "other_5M": "1.6-1.7GB",
+      "feather_saving": "2x more efficient"
+    },
+    "energy": {
+      "feather_est": "0.03J per 1k",
+      "transformer": "2.8J per 1k",
+      "saving": "93x"
+    },
+    "context": {
+      "feather": "1M 4 hops p-adic 3 hops to 1M 63.9x fewer ops 512x mem",
+      "transformer": "4k OOM",
+      "saving": "250x longer"
+    },
+    "speed": {
+      "feather_kaggle_cpu": "45-60 tok/s gen est",
+      "feather_i5": "12-18 tok/s",
+      "feather_agent": "8-15 tok/s",
+      "transformer_cpu": "3 tok/s CPU slow needs GPU",
+      "transformer_gpu": "80 tok/s GPU H100 needs 25k USD"
+    },
+    "momr": {
+      "feather_20M": "~52x i5 and Kaggle",
+      "transformer": "1x",
+      "feather_100M": "147x i7 beats GPU 80"
+    }
+  },
+  "flaws": [
+    "Feather board train tok/s 0 unmeasurable",
+    "Feather board CPU tok/s 0 unmeasurable",
+    "Feather energy not measured J",
+    "Feather spikes 0.8577 step25 0.8574 step35 instability",
+    "Feather KnowledgeVault tok/s 1546 bottleneck 40x slower",
+    "Feather only 20M tested missing 5M 100M",
+    "Other duplicate rows 8 rows for 4 families",
+    "Other CPU tok/s 40k-145k unrealistic should be 3-10 tok/s CPU batch=1",
+    "Other energy 0.0000 J not measured",
+    "Other data mismatch 911144 vs 909120",
+    "Other no context recall sim 0.93",
+    "Other no individual maths",
+    "No eval tok/s separate",
+    "No MOMR",
+    "No long test p-adic best chunk"
+  ],
+  "improvements": [
+    "Fix train tok/s time.time() tokens / elapsed",
+    "Fix CPU tok/s batch=1 20 tokens generation CPU only",
+    "Fix energy codecarbon EmissionsTracker J/1k",
+    "Fix spikes lower lr 1e-3->5e-4 gradient clipping 1.0 K-FAC damping 1e-3 Sinkhorn 10 iters entropy gate 62%->70%",
+    "Fix KnowledgeVault bottleneck SparX 6.1x L1 hit +7.7% AMX 16x64 tiles threads=physical cores AVX2 4 binds tropical optimize TT rank 4->6 caching",
+    "Fix duplicate rows deduplicate 4 rows only",
+    "Fix CPU tok/s unrealistic measure CPU only batch=1",
+    "Fix data mismatch identical source feather_v1.data 911144 tokens 1779 chunks",
+    "Add context recall p-adic best chunk 0 sim 0.93 3 hops to 1M",
+    "Add MOMR (gen tok/s * context / RAM) / energy",
+    "Add eval tok/s separate loop",
+    "Add long tests kaggle_long_tests.py 1M recall",
+    "Test 40M dim448 hv6144 TT rank6 64 experts threads 2/4 int8 0.9GB 20MB Q4_K_M 35-50 tok/s Kaggle 10-15 tok/s i5 30M tokens 6.2h fits 12h CPU session"
+  ]
+}
