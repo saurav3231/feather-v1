@@ -276,17 +276,21 @@ def main():
     print(
         f"{'size':<6} {'family':<12} {'eval loss (42/7)':<22} {'mean':<8} {'train tok/s':<15} {'CPU tok/s':<12} {'RAM':<8}"
     )
+    seen = set()
     for r in results:
-        same = [
-            x for x in results if x["size"] == r["size"] and x["family"] == r["family"]
-        ]
+        key = (r["size"], r["family"])
+        if key in seen:
+            continue
+        seen.add(key)
+        same = [x for x in results if x["size"] == r["size"] and x["family"] == r["family"]]
         l42 = next((x["eval_loss"] for x in same if x["seed"] == 42), 0)
         l7 = next((x["eval_loss"] for x in same if x["seed"] == 7), 0)
         mean_l = np.mean([l42, l7])
         t42 = next((x["train_tok_s"] for x in same if x["seed"] == 42), 0)
         t7 = next((x["train_tok_s"] for x in same if x["seed"] == 7), 0)
+        cpu_tok_s = "unmeasurable"
         print(
-            f"{r['size']:<6} {r['family']:<12} {l42:.2f} / {l7:.2f}          {mean_l:.2f}      {t42:.0f} / {t7:.0f}          {r['cpu_tok_s']:.0f}          {r['ram_gb']:.1f}GB"
+            f"{r['size']:<6} {r['family']:<12} {l42:.2f} / {l7:.2f}          {mean_l:.2f}      {t42:.0f} / {t7:.0f}          {cpu_tok_s:<12} {r['ram_gb']:.1f}GB"
         )
 
     out = REPO_ROOT / "kaggle" / f"other_archs_results_{size.lower()}.json"
