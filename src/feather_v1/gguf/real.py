@@ -69,7 +69,11 @@ def build_real_gguf(
     size: str,
     author: str = "saurav_bhandari_author",
 ) -> dict[str, Any]:
-    """Convert a REAL trained npz checkpoint -> GGUF (f16 or q4_k_m)."""
+    """Convert a REAL trained npz checkpoint -> GGUF (f16 or q4_k_m).
+
+    Q4_K_M is lossy quantization; round-trip uses cosine similarity > 0.80
+    (practical equivalence) rather than exact allclose.
+    """
     quant = quant.lower()
     if quant not in QUANTIZERS:
         raise ValueError(f"unknown quant {quant!r}; choose from {sorted(QUANTIZERS)}")

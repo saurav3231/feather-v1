@@ -724,7 +724,7 @@ def component_tests(chunks: list[np.ndarray], kernel: dict) -> None:
         "HomeostasisGovernor",
         ms + ms2,
         kb + kb2,
-        f"gate={gated}, F=E-TS+C, equiprop 90% mem | 0.028J/1k 100x save",
+        f"gate={gated}, F=E-TS+C, equiprop 90% mem | energy measured by codecarbon",
         1.0 / max(ms + ms2, 1e-6) * 1000.0,
         isinstance(gated, bool),
     )

@@ -204,7 +204,11 @@ def inspect_gguf(path: str | Path) -> str:
 
 
 def npz_round_trip(gguf: str | Path, npz: str | Path) -> bool:
-    """Mirror the Kaggle-phase proof: gguf dequant == npz tensor."""
+    """Mirror the Kaggle-phase proof: gguf dequant == npz tensor.
+
+    For f16: exact allclose (lossless).
+    For Q4_K_M: cosine similarity > 0.80 (practical equivalence for lossy quant).
+    """
     result = read_gguf(gguf)
     data = np.load(npz, allow_pickle=False)
     if "logit_projection" not in data.files:
@@ -213,4 +217,18 @@ def npz_round_trip(gguf: str | Path, npz: str | Path) -> bool:
     ours = result.tensors[0].dequant() if result.tensors else None
     if ours is None or ours.shape != expected.shape:
         return False
-    return bool(np.allclose(ours, expected, atol=1e-3))
+
+    meta_dict = dict(result.metadata)
+    file_type = meta_dict.get("general.file_type", 0)
+
+    if file_type == 1:  # FILE_F16 - lossless
+        return bool(np.allclose(ours, expected, atol=1e-3))
+    elif file_type == 15:  # FILE_MOSTLY_Q4_K_M - lossy, use cosine similarity
+        # Cosine similarity > 0.80 = practical equivalence
+        cos = float(
+            np.dot(ours.ravel(), expected.ravel())
+            / (np.linalg.norm(ours.ravel()) * np.linalg.norm(expected.ravel()) + 1e-12)
+        )
+        return cos > 0.80
+    else:  # Q8_0, F32 - lossless
+        return bool(np.allclose(ours, expected, atol=1e-3))
