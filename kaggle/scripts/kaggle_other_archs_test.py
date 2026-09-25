@@ -168,7 +168,7 @@ def main():
         print("ERROR: torch required for other architectures test")
         sys.exit(1)
 
-    size = os.environ.get("SIZE", "20M")
+    size = os.environ.get("SIZE", "5M")
     steps = int(os.environ.get("FEATHER_TRAIN_STEPS", "600"))
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}")
@@ -191,7 +191,7 @@ def main():
         train_tensors[:, :-1], train_tensors[:, 1:]
     )
     train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=1, shuffle=False
+        train_dataset, batch_size=1, shuffle=True
     )
 
     families = [
@@ -231,7 +231,14 @@ def main():
                     break
                 loss = train_step(model, optimizer, x.to(device), y.to(device), device)
                 step_losses.append(loss)
+                if step % 50 == 0 or step == steps - 1:
+                    print(f"    step {step:4d}: loss {loss:.4f}")
             _ = time.perf_counter() - t0
+
+            eval_start = max(0, steps - 50)
+            eval_losses = step_losses[eval_start:]
+            eval_loss = float(np.mean(eval_losses)) if eval_losses else 0.0
+            print(f"  seed {seed}: eval loss {eval_loss:.4f} (avg of last {len(eval_losses)} steps)")
 
             tok_s = measure_tok_s(model, ids, min(50, steps), device)
             cpu_tok_s = measure_cpu_tok_s(model, seq_len, vocab, device)
@@ -243,9 +250,7 @@ def main():
                     "size": size,
                     "family": fam_name,
                     "seed": seed,
-                    "eval_loss": (
-                        float(np.mean(step_losses[-5:])) if step_losses else 0.0
-                    ),
+                    "eval_loss": eval_loss,
                     "train_tok_s": tok_s,
                     "cpu_tok_s": cpu_tok_s,
                     "ram_gb": ram,
@@ -253,7 +258,7 @@ def main():
                 }
             )
             print(
-                f"  seed {seed}: loss {results[-1]['eval_loss']:.2f} tok/s {tok_s:.0f} RAM {ram:.1f}GB"
+                f"  seed {seed}: loss {eval_loss:.2f} tok/s {tok_s:.0f} RAM {ram:.1f}GB"
             )
 
     energy_j = 0.0
