@@ -37,44 +37,63 @@ def _guard_torch() -> None:
         raise RuntimeError("feather_v1.hf requires 'torch' and 'transformers'")
 
 
-class _FeatherEngine(nn.Module):  # type: ignore[misc]
-    """nn.Module shell wrapping the numpy engine.
+if nn is not None:
 
-    Some transformers loaders call ``getattr(model, base_model_prefix)
-    .state_dict()`` to compute expected checkpoint keys.  A plain numpy
-    object would crash on that, so the numpy engine lives inside this
-    wrapper: ``state_dict()`` returns the (empty) torch view and every
-    other attribute is delegated to the numpy engine.
-    """
+    class _FeatherEngine(nn.Module):  # type: ignore[misc]
+        """nn.Module shell wrapping the numpy engine.
 
-    def __init__(self, core: CoreFeatherV1Config) -> None:
-        super().__init__()
-        self.engine = FeatherV1Model(core)
+        Some transformers loaders call ``getattr(model, base_model_prefix)
+        .state_dict()`` to compute expected checkpoint keys.  A plain numpy
+        object would crash on that, so the numpy engine lives inside this
+        wrapper: ``state_dict()`` returns the (empty) torch view and every
+        other attribute is delegated to the numpy engine.
+        """
 
-    def __getattr__(self, name: str) -> Any:
-        try:
-            return super().__getattr__(name)
-        except AttributeError as err:
-            engine = object.__getattribute__(self, "engine")
+        def __init__(self, core: CoreFeatherV1Config) -> None:
+            super().__init__()
+            self.engine = FeatherV1Model(core)
+
+        def __getattr__(self, name: str) -> Any:
+            try:
+                return super().__getattr__(name)
+            except AttributeError as err:
+                engine = object.__getattribute__(self, "engine")
+                if name == "engine":
+                    raise err
+                return getattr(engine, name)
+
+        def __setattr__(self, name: str, value: Any) -> None:
+            engine = self.__dict__.get("engine")
+            if (
+                name != "engine"
+                and engine is not None
+                and not isinstance(value, (nn.Module, nn.Parameter, torch.Tensor))
+            ):
+                setattr(engine, name, value)
+                return
+            super().__setattr__(name, value)
+
+else:
+
+    class _FeatherEngine:  # type: ignore[no-redef]
+        """Torch-less fallback so importing this module stays side-effect free."""
+
+        def __init__(self, core: CoreFeatherV1Config) -> None:
+            self.engine = FeatherV1Model(core)
+
+        def __getattr__(self, name: str) -> Any:
+            return getattr(self.engine, name)
+
+        def __setattr__(self, name: str, value: Any) -> None:
             if name == "engine":
-                raise err
-            return getattr(engine, name)
-
-    def __setattr__(self, name: str, value: Any) -> None:
-        engine = self.__dict__.get("engine")
-        if (
-            name != "engine"
-            and engine is not None
-            and not isinstance(value, (nn.Module, nn.Parameter, torch.Tensor))
-        ):
-            setattr(engine, name, value)
-            return
-        super().__setattr__(name, value)
+                object.__setattr__(self, name, value)
+            else:
+                setattr(self.engine, name, value)
 
 
 class FeatherV1ForCausalLM(PreTrainedModel):  # type: ignore[misc, valid-type]
     config_class = FeatherV1Config
-    base_model_prefix = "feather"
+    base_model_prefix = ""
     _supports_cache_class = False
     supports_gradient_checkpointing = False
     _no_split_modules: list[str] = []
