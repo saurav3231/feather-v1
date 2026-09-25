@@ -38,6 +38,13 @@ LSTM       cos -0.05 FAILS         (exponential forgetting)
 
 ## Architecture
 
+> **Final architecture blueprint (10 pages, simple English, no code):**
+> [docs/ARCHITECTURE_FINAL_v1.0.md](docs/ARCHITECTURE_FINAL_v1.0.md)
+> — the big picture, 6 components, 12 maths, hardware table, data flow,
+> verification, performance vs Transformer/BitNet/Phi-4/iPhone, and the
+> 200-year vision. **How it becomes code (5 pages, class diagram + shapes +
+> forward flow):** [docs/MODEL_DESIGN_v1.0.md](docs/MODEL_DESIGN_v1.0.md).
+
 ```mermaid
 flowchart TD
     A["Input text<br/>byte-level branching tokenizer<br/>Nepali + English"] --> B
