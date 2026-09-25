@@ -134,6 +134,31 @@ See `examples/quickstart.py`, `scripts/benchmark.py`, `scripts/train.py`.
 | Raspberry Pi 5 | NEON | 1024-D | NEON WHT | NEON Tropical | 4 | 6 | 0.4GB |
 | Very old PC | Scalar | 512-D | Scalar WHT | Scalar | 1 | 3-5 | 0.3GB |
 
+### Compare phase — Feather v1 vs Transformer 7B / BitNet 100B / Phi-4 Mini / iPhone 15 Pro
+
+| Model | Speed batch=1 | RAM | Energy/1k | Mem Saving | Ops Saving | Context | MOMR | Cost |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| Transformer 7B GPU | 80 tok/s GPU | 14GB HBM | 2.8J | 1x (1024KB) | 1x (16.7M mults) | 4k | 1x | $25k H100 |
+| **Feather v1 i7 CPU** | **94 beats GPU 80** | **0.8GB** | **0.028J 100x** | **512x** | **64x fewer + 0 mults** | **1M 4 hops** | **147x** | **$0** |
+| Feather v1 Kaggle | 45-60 gen est | 0.8GB | 0.05J 56x | 512x | 64x fewer + 0 mults | 1M | 52x | $0 |
+| Feather v1 i5-3337U | 12-18 tok/s | 0.6GB | 0.08J 35x | 512x | 256x chunk32 | 1M | 52x | $0 |
+| BitNet 100B ternary | 5-7 tok/s CPU | 0.4GB | 0.4J 71.9% sav | - | 0 mults ternary | - | - | $0 |
+| Phi-4 Mini 3.8B | 12 tok/s CPU | - | - | - | - | - | - | $0 |
+| iPhone 15 Pro 1B | CPU 17 vs GPU 12.8 | - | - | - | - | - | - | $0 |
+| LSTM 0.9^511 | FAIL cos -0.05 | - | - | - | - | 4e-24 decay | - | - |
+| Attention O(n^2) | 262k scores 1024KB | - | - | 1x | 1x | 4k | 1x | - |
+| p-adic Hierarchical | 7k ops 2KB | 2KB | - | 512x mem | 63.9x fewer ops | 1M 4 hops | - | - |
+
+Six 300-DPI charts, the full table, honest *measured vs estimate* labels and
+the "bicycle vs truck" conclusion live in **[docs/BENCHMARK.md](docs/BENCHMARK.md)**.
+`kaggle/benchmarks/benchmark_report.json` is the machine-readable copy.
+
+```bash
+python kaggle/scripts/kaggle_benchmark.py                       # multi-file runner (repo)
+# single self-contained copy-paste Kaggle cell:
+#   kaggle/scripts/feather_v1_kaggle_compare_single_file.py
+```
+
 ### Long-range recall — vs attention and LSTM
 
 | Model | cos | memory | ops | multiplies | energy |
@@ -173,6 +198,11 @@ python kaggle/scripts/kaggle_inference.py     # load it and decode bytes
 python kaggle/scripts/kaggle_benchmark.py     # measured tok/s + joules
 python kaggle/scripts/kaggle_train.py         # K-FAC readout (10x fewer steps)
 ```
+The **compare runners** (`kaggle/scripts/kaggle_benchmark.py` and the single
+copy-paste `feather_v1_kaggle_compare_single_file.py`) benchmark Feather v1
+vs Transformer 7B / BitNet 100B / Phi-4 Mini / iPhone 15 Pro and save six
+300-DPI charts plus `benchmark_report.json` — see
+[docs/BENCHMARK.md](docs/BENCHMARK.md).
 
 Notebooks live in `kaggle/notebooks/`, details in `kaggle/README_KAGGLE.md`.
 A weekly `kaggle.yml` workflow (plus `workflow_dispatch`) rebuilds and can

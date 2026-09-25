@@ -77,3 +77,6 @@ models/
 
 # Logs
 *.log
+# codecarbon
+emissions*.csv
+emissions/
