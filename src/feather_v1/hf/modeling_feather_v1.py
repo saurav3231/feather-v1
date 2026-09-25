@@ -37,6 +37,41 @@ def _guard_torch() -> None:
         raise RuntimeError("feather_v1.hf requires 'torch' and 'transformers'")
 
 
+class _FeatherEngine(nn.Module):  # type: ignore[misc]
+    """nn.Module shell wrapping the numpy engine.
+
+    Some transformers loaders call ``getattr(model, base_model_prefix)
+    .state_dict()`` to compute expected checkpoint keys.  A plain numpy
+    object would crash on that, so the numpy engine lives inside this
+    wrapper: ``state_dict()`` returns the (empty) torch view and every
+    other attribute is delegated to the numpy engine.
+    """
+
+    def __init__(self, core: CoreFeatherV1Config) -> None:
+        super().__init__()
+        self.engine = FeatherV1Model(core)
+
+    def __getattr__(self, name: str) -> Any:
+        try:
+            return super().__getattr__(name)
+        except AttributeError as err:
+            engine = object.__getattribute__(self, "engine")
+            if name == "engine":
+                raise err
+            return getattr(engine, name)
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        engine = self.__dict__.get("engine")
+        if (
+            name != "engine"
+            and engine is not None
+            and not isinstance(value, (nn.Module, nn.Parameter, torch.Tensor))
+        ):
+            setattr(engine, name, value)
+            return
+        super().__setattr__(name, value)
+
+
 class FeatherV1ForCausalLM(PreTrainedModel):  # type: ignore[misc, valid-type]
     config_class = FeatherV1Config
     base_model_prefix = "feather"
@@ -50,7 +85,7 @@ class FeatherV1ForCausalLM(PreTrainedModel):  # type: ignore[misc, valid-type]
         _guard_torch()
         super().__init__(config)
         core: CoreFeatherV1Config = config.to_core()
-        self.feather = FeatherV1Model(core)
+        self.feather = _FeatherEngine(core)
         self.embed = nn.Embedding(
             num_embeddings=core.vocab_size, embedding_dim=core.dim
         )
