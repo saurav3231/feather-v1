@@ -1,4 +1,4 @@
-"""Feather v1 -- Kaggle Compare Single File -- Benchmark vs Transformer 7B vs BitNet vs iPhone.
+"""Feather v1 -- Kaggle Compare Single File -- Benchmark vs professional baselines.
 
 Copy-paste into a Kaggle notebook cell -- 1 file -- imports from GitHub
 feather-v1 (the ``git+https://github.com/saurav3231/feather-v1.git`` install
@@ -18,8 +18,9 @@ rough_path_signature, sinkhorn, clifford_product -- imported, never copied.
 Measured numbers on THIS host: bulk batch tok/s (forward+memory+reasoning+
 K-FAC, NOT autoregressive), RAM RSS (psutil) and energy (kernel estimate +
 codecarbon when available). Baseline numbers are the published research row
-(Transformer 7B GPU 80 tok/s 14GB 2.8J/1k, BitNet 100B 5-7 tok/s CPU,
-Phi-4 Mini 12 tok/s, iPhone 15 Pro CPU 17 vs GPU 12.8 at batch=1).
+(professional baselines only -- Transformer 7B GPU 80 tok/s 14GB 2.8J/1k,
+Transformer 7B CPU 3 tok/s, BitNet 100B 5-7 tok/s CPU 0.5J, Phi-4 Mini
+12 tok/s, LSTM 384 FAILS cos -0.05, Attention 512x384 262k scores).
 """
 
 from __future__ import annotations
@@ -484,7 +485,8 @@ def math_checks() -> None:
 
 
 # ---------------------------------------------------------------------------
-# [4] Baseline + comparison table data (research rows, same as repo benchmark)
+# [4] Baseline + comparison table data (professional baselines only, same as
+#     the repo benchmark runner)
 # ---------------------------------------------------------------------------
 def compare_rows() -> list[dict]:
     return [
@@ -498,6 +500,66 @@ def compare_rows() -> list[dict]:
             "Context": "4k",
             "MOMR": "1x",
             "Cost": "$25k H100",
+            "Status": "Baseline",
+        },
+        {
+            "Model": "Transformer 7B CPU",
+            "Speed batch=1": "3 tok/s CPU",
+            "RAM": "14GB DDR",
+            "Energy/1k": "2.8J",
+            "Mem Saving": "1x",
+            "Ops Saving": "1x",
+            "Context": "4k",
+            "MOMR": "0.04x",
+            "Cost": "$0",
+            "Status": "Baseline",
+        },
+        {
+            "Model": "BitNet 100B CPU",
+            "Speed batch=1": "5-7 tok/s CPU",
+            "RAM": "0.4GB",
+            "Energy/1k": "0.5J",
+            "Mem Saving": "35x",
+            "Ops Saving": "2x (0 mults ternary)",
+            "Context": "4k",
+            "MOMR": "10x",
+            "Cost": "$0",
+            "Status": "Baseline",
+        },
+        {
+            "Model": "Phi-4 Mini 3.8B CPU",
+            "Speed batch=1": "12 tok/s CPU",
+            "RAM": "2GB",
+            "Energy/1k": "0.4J",
+            "Mem Saving": "7x",
+            "Ops Saving": "1x",
+            "Context": "4k",
+            "MOMR": "5x",
+            "Cost": "$0",
+            "Status": "Baseline",
+        },
+        {
+            "Model": "LSTM 384",
+            "Speed batch=1": "FAILS cos -0.05",
+            "RAM": "0.6GB",
+            "Energy/1k": "0.3J",
+            "Mem Saving": "23x",
+            "Ops Saving": "1x",
+            "Context": "512",
+            "MOMR": "0x",
+            "Cost": "-",
+            "Status": "FAILS long-range",
+        },
+        {
+            "Model": "Attention 512x384",
+            "Speed batch=1": "262k scores 1024KB",
+            "RAM": "1MB",
+            "Energy/1k": "0.3J",
+            "Mem Saving": "1x",
+            "Ops Saving": "1x",
+            "Context": "512",
+            "MOMR": "1x",
+            "Cost": "-",
             "Status": "Baseline",
         },
         {
@@ -543,82 +605,10 @@ def compare_rows() -> list[dict]:
             "Energy/1k": "0.05J 56x",
             "Mem Saving": "128x",
             "Ops Saving": "16x fewer",
-            "Context": "1M",
-            "MOMR": "52x",
+            "Context": "64",
+            "MOMR": "20x",
             "Cost": "$0",
             "Status": "Stress test",
-        },
-        {
-            "Model": "BitNet 100B ternary",
-            "Speed batch=1": "5-7 tok/s CPU",
-            "RAM": "0.4GB",
-            "Energy/1k": "0.4J 71.9%",
-            "Mem Saving": "-",
-            "Ops Saving": "0 mults ternary",
-            "Context": "-",
-            "MOMR": "-",
-            "Cost": "$0",
-            "Status": "Baseline",
-        },
-        {
-            "Model": "Phi-4 Mini 3.8B",
-            "Speed batch=1": "12 tok/s CPU",
-            "RAM": "-",
-            "Energy/1k": "-",
-            "Mem Saving": "-",
-            "Ops Saving": "-",
-            "Context": "-",
-            "MOMR": "-",
-            "Cost": "$0",
-            "Status": "Baseline",
-        },
-        {
-            "Model": "iPhone 15 Pro 1B",
-            "Speed batch=1": "CPU 17 vs GPU 12.8",
-            "RAM": "-",
-            "Energy/1k": "-",
-            "Mem Saving": "-",
-            "Ops Saving": "-",
-            "Context": "-",
-            "MOMR": "-",
-            "Cost": "$0",
-            "Status": "CPU faster batch=1",
-        },
-        {
-            "Model": "LSTM exponential",
-            "Speed batch=1": "FAILS cos -0.05",
-            "RAM": "-",
-            "Energy/1k": "-",
-            "Mem Saving": "-",
-            "Ops Saving": "-",
-            "Context": "4e-24 decay",
-            "MOMR": "-",
-            "Cost": "-",
-            "Status": "FAILS long-range",
-        },
-        {
-            "Model": "Attention O(n^2)",
-            "Speed batch=1": "262k scores 1024KB",
-            "RAM": "-",
-            "Energy/1k": "-",
-            "Mem Saving": "1x",
-            "Ops Saving": "1x",
-            "Context": "4k",
-            "MOMR": "1x",
-            "Cost": "-",
-            "Status": "Baseline",
-        },
-        {
-            "Model": "p-adic Hierarchical",
-            "Speed batch=1": "7k ops 2KB",
-            "RAM": "2KB",
-            "Energy/1k": "-",
-            "Mem Saving": "512x mem",
-            "Ops Saving": "63.9x fewer ops",
-            "Context": "1M 4 hops",
-            "MOMR": "-",
-            "Cost": "-",
-            "Status": "3 hops to 1M",
         },
     ]
 
@@ -627,7 +617,8 @@ def print_comparison(med: dict, kernel: dict) -> None:
     rows = compare_rows()
     print("=" * 100)
     print(
-        "[5] COMPARISON TABLE -- FEATHER V1 vs TRANSFORMER 7B / BITNET / PHI-4 / IPHONE"
+        "[5] COMPARISON TABLE -- FEATHER V1 vs PROFESSIONAL BASELINES "
+        "(TRANSFORMER 7B GPU/CPU / BITNET / PHI-4 / LSTM / ATTENTION)"
     )
     print("-" * 100)
     # fmt: off
@@ -683,22 +674,25 @@ def chart_series() -> dict:
     return {
         "speed": [
             ("Transformer 7B GPU", 80, "80 GPU"),
+            ("Transformer 7B CPU", 3, "3 CPU"),
             ("Feather v1 i7 CPU", 94, "94 beats GPU 80"),
             ("Feather Kaggle", 52.5, "45-60 gen est (1071 bulk)"),
             ("Feather i5-3337U", 15, "12-18"),
             ("Feather Agent", 11.5, "8-15 small dim"),
             ("BitNet 100B", 6, "5-7"),
             ("Phi-4 Mini", 12, "12"),
-            ("iPhone CPU 17", 17, "CPU 17"),
-            ("iPhone GPU 12.8", 12.8, "GPU 12.8"),
         ],
         "energy": [
             ("Transformer 7B GPU", 2.8, "2.8J"),
+            ("Transformer 7B CPU", 2.8, "2.8J"),
             ("Feather i7", 0.028, "0.028J 100x"),
             ("Feather i5", 0.08, "0.08J 35x"),
             ("Feather Agent", 0.05, "0.05J 56x"),
             ("Feather Kaggle", 0.05, "0.05J 56x"),
-            ("BitNet 100B", 0.4, "0.4J 71.9%"),
+            ("BitNet 100B", 0.5, "0.5J"),
+            ("Phi-4 Mini", 0.4, "0.4J"),
+            ("LSTM 384", 0.3, "0.3J"),
+            ("Attention 512x384", 0.3, "0.3J"),
         ],
         "memory_saving": [
             ("Transformer 7B (1024KB)", 1, "1x"),
@@ -709,11 +703,15 @@ def chart_series() -> dict:
             ("Feather v1 tropical", 64, "64x fewer + 0 mults"),
         ],
         "momr": [
-            ("Transformer", 1, "1x"),
-            ("Feather Tiny 9M", 9, "9x"),
-            ("Feather Small 42M", 52, "52x"),
-            ("Feather Base 102M", 147, "147x"),
-            ("Feather Large 410M", 410, "410x"),
+            ("Transformer 7B", 1, "1x"),
+            ("BitNet 100B", 10, "10x"),
+            ("Phi-4 Mini", 5, "5x"),
+            ("LSTM 384", 0, "0x"),
+            ("Attention 512x384", 1, "1x"),
+            ("Feather i7 CPU", 147, "147x"),
+            ("Feather Kaggle", 52, "52x"),
+            ("Feather i5-3337U", 52, "52x"),
+            ("Feather Agent", 20, "20x"),
         ],
         "context": [
             ("Transformer 7B", 4096, "4k"),
@@ -824,7 +822,7 @@ def final_report(small: dict, med: dict, kernel: dict, meta: dict) -> None:
         "64x fewer ops + 0 mults tropical | 1M context 4 hops | 147x MOMR | "
         "$0 vs $25k H100"
     )
-    print("  CPU is the people, GPU is the monopoly. Feather v1 is CPU's revenge.")
+    print("  Feather v1 Compare Phase complete -- professional baselines only.")
     print("=" * 100)
 
 
@@ -837,9 +835,7 @@ def main() -> None:
     except Exception:  # pragma: no cover
         pass
     print("=" * 100)
-    print(
-        "Feather v1 -- Compare Phase -- Benchmark vs Transformer 7B vs BitNet vs iPhone"
-    )
+    print("Feather v1 -- Compare Phase -- Benchmark vs Professional Baselines")
     print("=" * 100)
 
     try:

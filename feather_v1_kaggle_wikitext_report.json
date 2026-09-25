@@ -1,0 +1,731 @@
+{
+  "hardware": {
+    "hypervector_dim": 1024,
+    "hv_memory_kb": 4,
+    "binding": "avx_wht",
+    "binds_per_instruction": 2,
+    "moe": "avx_tropical_tt",
+    "moe_tiles": "4x32",
+    "precision": "int8",
+    "threads": 2,
+    "cache": "L1",
+    "expected_tok_per_sec": "12-18 tok/s",
+    "joules_per_1k": 0.08,
+    "kaggle": false,
+    "ram_gb": 3.0068397521972656,
+    "internet": true
+  },
+  "wikitext": {
+    "source": "datasets:Salesforce/wikitext/wikitext-2-raw-v1",
+    "num_lines": 2000,
+    "num_tokens": 911144,
+    "num_chunks": 1779,
+    "avg_tokens_per_line": 455.57,
+    "vocab_bits": 8
+  },
+  "individual": [
+    {
+      "test": "FWHT",
+      "input": "1024-D",
+      "output": "norm 31.1",
+      "time_ms": 0.87,
+      "memory_kb": 16.0,
+      "saving": "10240 adds 0 mults 10x energy vs FFT",
+      "status": "PASS"
+    },
+    {
+      "test": "Fractional",
+      "input": "alpha 0.7 k=512",
+      "output": "w_511 5.61e-04",
+      "time_ms": 0.24,
+      "memory_kb": 0.0,
+      "saving": "3.25e20x retention vs exp",
+      "status": "PASS"
+    },
+    {
+      "test": "Tropical",
+      "input": "1000 vals",
+      "output": "min -3.197",
+      "time_ms": 0.17,
+      "memory_kb": 8.0,
+      "saving": "0 mults 123x energy",
+      "status": "PASS"
+    },
+    {
+      "test": "p-adic",
+      "input": "d(0,64) p=2",
+      "output": "0.015625",
+      "time_ms": 0.01,
+      "memory_kb": 0.0,
+      "saving": "63.9x fewer ops 512x mem",
+      "status": "PASS"
+    },
+    {
+      "test": "Tensor-Train",
+      "input": "64x64",
+      "output": "G1 (64, 4) G2 (4, 64)",
+      "time_ms": 4.01,
+      "memory_kb": 500.0,
+      "saving": "rank-4 8x compression",
+      "status": "PASS"
+    },
+    {
+      "test": "RoughPath",
+      "input": "64x3 path",
+      "output": "sig 13 vals",
+      "time_ms": 1.69,
+      "memory_kb": 4.0,
+      "saving": "2520x compression",
+      "status": "PASS"
+    },
+    {
+      "test": "Sinkhorn",
+      "input": "cost 8x8",
+      "output": "row-sum std 0.010",
+      "time_ms": 0.92,
+      "memory_kb": 24.0,
+      "saving": "5x balanced vs softmax",
+      "status": "PASS"
+    },
+    {
+      "test": "Clifford",
+      "input": "8-vec pair",
+      "output": "mvec [-1.529 -0.554  0.131  0.369  0.661 -0.672  0.662 -0.172]",
+      "time_ms": 0.66,
+      "memory_kb": 24.0,
+      "saving": "5 ops 4x reduction",
+      "status": "PASS"
+    },
+    {
+      "test": "K-FAC",
+      "input": "48x64 readout",
+      "output": "final 1.15e-04",
+      "time_ms": 491.14,
+      "memory_kb": 0.0,
+      "saving": "10x fewer steps",
+      "status": "PASS"
+    },
+    {
+      "test": "Sheaf",
+      "input": "consistency",
+      "output": "ok=True",
+      "time_ms": 0.5,
+      "memory_kb": 0.0,
+      "saving": "Krum+Trimmed robust, DP eps=1.0",
+      "status": "PASS"
+    },
+    {
+      "test": "Equilibrium",
+      "input": "64-D free/nudge",
+      "output": "dW (64, 64)",
+      "time_ms": 0.2,
+      "memory_kb": 0.0,
+      "saving": "90% memory saving",
+      "status": "PASS"
+    },
+    {
+      "test": "Jacobi",
+      "input": "draft 4/8",
+      "output": "update [63 63 63 63]",
+      "time_ms": 0.17,
+      "memory_kb": 4.0,
+      "saving": "66% latency cut",
+      "status": "PASS"
+    }
+  ],
+  "components": [
+    {
+      "test": "SensoryEncoder",
+      "input": "512x384",
+      "output": "sig 13 vals",
+      "time_ms": 10.1,
+      "memory_kb": 1484.0,
+      "saving": "15123x compression (2520x)",
+      "tps": 50706.1,
+      "loss": "-",
+      "energy_j_per_1k": "-",
+      "status": "PASS"
+    },
+    {
+      "test": "LiquidMemory",
+      "input": "512x384",
+      "output": "power-law M_t ~9KB, sparsity 98%",
+      "time_ms": 6.75,
+      "memory_kb": 0.0,
+      "saving": "3.25e20x retention",
+      "tps": 75813.7,
+      "loss": "-",
+      "energy_j_per_1k": "-",
+      "status": "PASS"
+    },
+    {
+      "test": "KnowledgeVault",
+      "input": "512x384",
+      "output": "trop expert (384,) TT rank 4",
+      "time_ms": 0.38,
+      "memory_kb": 0.0,
+      "saving": "0 mults 123x, sinkhorn std 0.000 5x balanced",
+      "tps": 2654.6,
+      "loss": "-",
+      "energy_j_per_1k": "-",
+      "status": "PASS"
+    },
+    {
+      "test": "CognitiveWeaver",
+      "input": "512x384",
+      "output": "loops used avg 6.0 vs 6 60% save, entropy gate 62% early",
+      "time_ms": 1.05,
+      "memory_kb": 0.0,
+      "saving": "K-FAC 10x fewer steps",
+      "tps": 486183.6,
+      "loss": "-",
+      "energy_j_per_1k": "-",
+      "status": "PASS"
+    },
+    {
+      "test": "HomeostasisGovernor",
+      "input": "512x384",
+      "output": "gate=False, F=E-TS+C, equiprop 90% mem",
+      "time_ms": 0.34,
+      "memory_kb": 0.0,
+      "saving": "0.028J/1k 100x save",
+      "tps": 2982.4,
+      "loss": "-",
+      "energy_j_per_1k": "-",
+      "status": "PASS"
+    },
+    {
+      "test": "GenerativeEvolution",
+      "input": "512x384",
+      "output": "jacobi draft iters avg 4 66% cut, sheaf+godel",
+      "time_ms": 0.25,
+      "memory_kb": 0.0,
+      "saving": "adaptive len",
+      "tps": 2020520.9,
+      "loss": "-",
+      "energy_j_per_1k": "-",
+      "status": "PASS"
+    }
+  ],
+  "training": [
+    {
+      "step": 0,
+      "loss": 2.0752,
+      "tps": 533.5,
+      "energy_j": 0.041,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.4,
+      "tokens": 512,
+      "time_ms": 959.7
+    },
+    {
+      "step": 1,
+      "loss": 0.6786,
+      "tps": 472.2,
+      "energy_j": 0.0819,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.4,
+      "tokens": 1024,
+      "time_ms": 1208.5
+    },
+    {
+      "step": 2,
+      "loss": 0.6518,
+      "tps": 469.2,
+      "energy_j": 0.1229,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.4,
+      "tokens": 1536,
+      "time_ms": 1104.7
+    },
+    {
+      "step": 3,
+      "loss": 0.5978,
+      "tps": 455.5,
+      "energy_j": 0.1638,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.4,
+      "tokens": 2048,
+      "time_ms": 1222.1
+    },
+    {
+      "step": 4,
+      "loss": 0.6236,
+      "tps": 429.3,
+      "energy_j": 0.2048,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.4,
+      "tokens": 2560,
+      "time_ms": 1466.6
+    },
+    {
+      "step": 5,
+      "loss": 0.589,
+      "tps": 446.1,
+      "energy_j": 0.2458,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.4,
+      "tokens": 3072,
+      "time_ms": 923.9
+    },
+    {
+      "step": 6,
+      "loss": 0.5653,
+      "tps": 459.0,
+      "energy_j": 0.2867,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.4,
+      "tokens": 3584,
+      "time_ms": 920.8
+    },
+    {
+      "step": 7,
+      "loss": 0.5645,
+      "tps": 450.3,
+      "energy_j": 0.3277,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.4,
+      "tokens": 4096,
+      "time_ms": 1288.3
+    },
+    {
+      "step": 8,
+      "loss": 0.579,
+      "tps": 448.6,
+      "energy_j": 0.3686,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.4,
+      "tokens": 4608,
+      "time_ms": 1174.9
+    },
+    {
+      "step": 9,
+      "loss": 0.6202,
+      "tps": 456.2,
+      "energy_j": 0.4096,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.4,
+      "tokens": 5120,
+      "time_ms": 951.9
+    },
+    {
+      "step": 10,
+      "loss": 0.5818,
+      "tps": 460.4,
+      "energy_j": 0.4506,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.4,
+      "tokens": 5632,
+      "time_ms": 1007.9
+    },
+    {
+      "step": 11,
+      "loss": 0.5952,
+      "tps": 463.7,
+      "energy_j": 0.4915,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.4,
+      "tokens": 6144,
+      "time_ms": 1017.0
+    },
+    {
+      "step": 12,
+      "loss": 0.5794,
+      "tps": 454.8,
+      "energy_j": 0.5325,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.4,
+      "tokens": 6656,
+      "time_ms": 1387.0
+    },
+    {
+      "step": 13,
+      "loss": 0.5712,
+      "tps": 453.3,
+      "energy_j": 0.5734,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.4,
+      "tokens": 7168,
+      "time_ms": 1177.9
+    },
+    {
+      "step": 14,
+      "loss": 0.5914,
+      "tps": 457.8,
+      "energy_j": 0.6144,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.4,
+      "tokens": 7680,
+      "time_ms": 959.7
+    },
+    {
+      "step": 15,
+      "loss": 0.588,
+      "tps": 454.3,
+      "energy_j": 0.6554,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.4,
+      "tokens": 8192,
+      "time_ms": 1258.2
+    },
+    {
+      "step": 16,
+      "loss": 0.5958,
+      "tps": 455.5,
+      "energy_j": 0.6963,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.4,
+      "tokens": 8704,
+      "time_ms": 1076.9
+    },
+    {
+      "step": 17,
+      "loss": 0.5524,
+      "tps": 459.1,
+      "energy_j": 0.7373,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.4,
+      "tokens": 9216,
+      "time_ms": 965.0
+    },
+    {
+      "step": 18,
+      "loss": 0.5883,
+      "tps": 464.2,
+      "energy_j": 0.7782,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.5,
+      "tokens": 9728,
+      "time_ms": 882.4
+    },
+    {
+      "step": 19,
+      "loss": 0.6052,
+      "tps": 469.5,
+      "energy_j": 0.8192,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.5,
+      "tokens": 10240,
+      "time_ms": 852.8
+    },
+    {
+      "step": 20,
+      "loss": 0.6216,
+      "tps": 474.1,
+      "energy_j": 0.8602,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.5,
+      "tokens": 10752,
+      "time_ms": 867.9
+    },
+    {
+      "step": 21,
+      "loss": 0.5771,
+      "tps": 476.2,
+      "energy_j": 0.9011,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.5,
+      "tokens": 11264,
+      "time_ms": 974.6
+    },
+    {
+      "step": 22,
+      "loss": 0.5706,
+      "tps": 464.8,
+      "energy_j": 0.9421,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.5,
+      "tokens": 11776,
+      "time_ms": 1682.9
+    },
+    {
+      "step": 23,
+      "loss": 0.6004,
+      "tps": 458.8,
+      "energy_j": 0.983,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.5,
+      "tokens": 12288,
+      "time_ms": 1444.3
+    },
+    {
+      "step": 24,
+      "loss": 0.583,
+      "tps": 459.1,
+      "energy_j": 1.024,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.5,
+      "tokens": 12800,
+      "time_ms": 1100.0
+    },
+    {
+      "step": 25,
+      "loss": 0.614,
+      "tps": 459.4,
+      "energy_j": 1.065,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.8,
+      "tokens": 13312,
+      "time_ms": 1096.1
+    },
+    {
+      "step": 26,
+      "loss": 0.585,
+      "tps": 461.3,
+      "energy_j": 1.1059,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.8,
+      "tokens": 13824,
+      "time_ms": 990.2
+    },
+    {
+      "step": 27,
+      "loss": 0.5882,
+      "tps": 464.1,
+      "energy_j": 1.1469,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.8,
+      "tokens": 14336,
+      "time_ms": 921.9
+    },
+    {
+      "step": 28,
+      "loss": 0.6101,
+      "tps": 466.9,
+      "energy_j": 1.1878,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.8,
+      "tokens": 14848,
+      "time_ms": 910.6
+    },
+    {
+      "step": 29,
+      "loss": 0.5539,
+      "tps": 469.1,
+      "energy_j": 1.2288,
+      "j_per_1k": 0.08,
+      "mem_mb": 2995.8,
+      "tokens": 15360,
+      "time_ms": 944.7
+    },
+    {
+      "step": 30,
+      "loss": 0.5971,
+      "tps": 471.7,
+      "energy_j": 1.2698,
+      "j_per_1k": 0.08,
+      "mem_mb": 2996.1,
+      "tokens": 15872,
+      "time_ms": 900.1
+    },
+    {
+      "step": 31,
+      "loss": 0.5627,
+      "tps": 473.6,
+      "energy_j": 1.3107,
+      "j_per_1k": 0.08,
+      "mem_mb": 2996.1,
+      "tokens": 16384,
+      "time_ms": 950.6
+    },
+    {
+      "step": 32,
+      "loss": 0.5887,
+      "tps": 475.3,
+      "energy_j": 1.3517,
+      "j_per_1k": 0.08,
+      "mem_mb": 2996.1,
+      "tokens": 16896,
+      "time_ms": 954.3
+    },
+    {
+      "step": 33,
+      "loss": 0.6087,
+      "tps": 477.3,
+      "energy_j": 1.3926,
+      "j_per_1k": 0.08,
+      "mem_mb": 2996.1,
+      "tokens": 17408,
+      "time_ms": 920.7
+    },
+    {
+      "step": 34,
+      "loss": 0.5995,
+      "tps": 472.2,
+      "energy_j": 1.4336,
+      "j_per_1k": 0.08,
+      "mem_mb": 2996.5,
+      "tokens": 17920,
+      "time_ms": 1475.9
+    },
+    {
+      "step": 35,
+      "loss": 0.6624,
+      "tps": 469.2,
+      "energy_j": 1.4746,
+      "j_per_1k": 0.08,
+      "mem_mb": 2996.5,
+      "tokens": 18432,
+      "time_ms": 1333.3
+    },
+    {
+      "step": 36,
+      "loss": 0.6024,
+      "tps": 470.6,
+      "energy_j": 1.5155,
+      "j_per_1k": 0.08,
+      "mem_mb": 2996.5,
+      "tokens": 18944,
+      "time_ms": 969.8
+    },
+    {
+      "step": 37,
+      "loss": 0.5995,
+      "tps": 472.5,
+      "energy_j": 1.5565,
+      "j_per_1k": 0.08,
+      "mem_mb": 2997.0,
+      "tokens": 19456,
+      "time_ms": 923.1
+    },
+    {
+      "step": 38,
+      "loss": 0.609,
+      "tps": 474.4,
+      "energy_j": 1.5974,
+      "j_per_1k": 0.08,
+      "mem_mb": 2997.0,
+      "tokens": 19968,
+      "time_ms": 912.8
+    },
+    {
+      "step": 39,
+      "loss": 0.6082,
+      "tps": 474.3,
+      "energy_j": 1.6384,
+      "j_per_1k": 0.08,
+      "mem_mb": 2997.0,
+      "tokens": 20480,
+      "time_ms": 1094.4
+    },
+    {
+      "step": 40,
+      "loss": 0.6051,
+      "tps": 474.7,
+      "energy_j": 1.6794,
+      "j_per_1k": 0.08,
+      "mem_mb": 2997.0,
+      "tokens": 20992,
+      "time_ms": 1037.5
+    },
+    {
+      "step": 41,
+      "loss": 0.5808,
+      "tps": 472.0,
+      "energy_j": 1.7203,
+      "j_per_1k": 0.08,
+      "mem_mb": 2997.1,
+      "tokens": 21504,
+      "time_ms": 1340.8
+    },
+    {
+      "step": 42,
+      "loss": 0.6191,
+      "tps": 473.2,
+      "energy_j": 1.7613,
+      "j_per_1k": 0.08,
+      "mem_mb": 2997.1,
+      "tokens": 22016,
+      "time_ms": 961.9
+    },
+    {
+      "step": 43,
+      "loss": 0.5797,
+      "tps": 473.1,
+      "energy_j": 1.8022,
+      "j_per_1k": 0.08,
+      "mem_mb": 2997.1,
+      "tokens": 22528,
+      "time_ms": 1090.8
+    },
+    {
+      "step": 44,
+      "loss": 0.6127,
+      "tps": 471.3,
+      "energy_j": 1.8432,
+      "j_per_1k": 0.08,
+      "mem_mb": 2997.1,
+      "tokens": 23040,
+      "time_ms": 1267.2
+    },
+    {
+      "step": 45,
+      "loss": 0.5978,
+      "tps": 469.4,
+      "energy_j": 1.8842,
+      "j_per_1k": 0.08,
+      "mem_mb": 2997.1,
+      "tokens": 23552,
+      "time_ms": 1295.0
+    },
+    {
+      "step": 46,
+      "loss": 0.6052,
+      "tps": 470.3,
+      "energy_j": 1.9251,
+      "j_per_1k": 0.08,
+      "mem_mb": 2997.1,
+      "tokens": 24064,
+      "time_ms": 990.8
+    },
+    {
+      "step": 47,
+      "loss": 0.5692,
+      "tps": 467.0,
+      "energy_j": 1.9661,
+      "j_per_1k": 0.08,
+      "mem_mb": 2997.1,
+      "tokens": 24576,
+      "time_ms": 1458.7
+    },
+    {
+      "step": 48,
+      "loss": 0.5965,
+      "tps": 466.8,
+      "energy_j": 2.007,
+      "j_per_1k": 0.08,
+      "mem_mb": 2997.1,
+      "tokens": 25088,
+      "time_ms": 1120.4
+    },
+    {
+      "step": 49,
+      "loss": 0.6063,
+      "tps": 466.4,
+      "energy_j": 2.048,
+      "j_per_1k": 0.08,
+      "mem_mb": 2997.1,
+      "tokens": 25600,
+      "time_ms": 1141.4
+    }
+  ],
+  "notes": {
+    "j_per_1k": "KERNEL-COMPUTE ESTIMATE from the offline profile; NOT a hardware measurement. See summary.energy_j_measured for the codecarbon metered machine energy.",
+    "train_tps": "Bulk batch training throughput (512-token chunk/step incl. forward+memory+reasoning+K-FAC); NOT autoregressive text-generation rate. Generation estimate is summary.expected_gen_tok_per_sec.",
+    "savings": "Derived ratios vs baseline primitives; reproducible but not independently benchmarked hardware numbers."
+  },
+  "summary": {
+    "tests_run": 68,
+    "passed": 68,
+    "pass_rate": 100.0,
+    "kernel_binding": "avx_wht",
+    "energy_j_measured": 1133.0,
+    "expected_gen_tok_per_sec": "12-18 tok/s",
+    "train_tps": 466.4,
+    "final_loss": 0.6063,
+    "first_loss": 2.0752,
+    "saving_ratio_median_x": 8.0,
+    "saving_ratio_max_x": 2520.0,
+    "saving_ratio_mean_x": 510.6
+  }
+}

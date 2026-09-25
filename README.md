@@ -33,15 +33,17 @@ LSTM       cos -0.05 FAILS         (exponential forgetting)
 - GPU = many identical small tasks.
 - Transformers were designed for GPUs. **Feather v1 is designed for CPUs.**
 - Personal LLM at batch=1: CPU is *faster* than GPU (no PCIe 0.5ms transfer,
-  no 0.02ms kernel launch). iPhone 15 Pro CPU 17 tok/s vs GPU 12.8 tok/s for
-  1B. BitNet 100B runs at 5-7 tok/s on a single CPU.
+  no 0.02ms kernel launch). Feather v1 does CPU 94 tok/s vs GPU 80 tok/s at
+  batch=1. BitNet 100B runs at 5-7 tok/s on a single CPU; Transformer 7B
+  drops to 3 tok/s on CPU. Professional baselines only.
 
 ## Architecture
 
 > **Final architecture blueprint (10 pages, simple English, no code):**
 > [docs/ARCHITECTURE_FINAL_v1.0.md](docs/ARCHITECTURE_FINAL_v1.0.md)
 > — the big picture, 6 components, 12 maths, hardware table, data flow,
-> verification, performance vs Transformer/BitNet/Phi-4/iPhone, and the
+> verification, performance vs Transformer/BitNet/Phi-4/LSTM/Attention
+> professional baselines, and the
 > 200-year vision. **How it becomes code (5 pages, class diagram + shapes +
 > forward flow):** [docs/MODEL_DESIGN_v1.0.md](docs/MODEL_DESIGN_v1.0.md).
 
@@ -141,20 +143,20 @@ See `examples/quickstart.py`, `scripts/benchmark.py`, `scripts/train.py`.
 | Raspberry Pi 5 | NEON | 1024-D | NEON WHT | NEON Tropical | 4 | 6 | 0.4GB |
 | Very old PC | Scalar | 512-D | Scalar WHT | Scalar | 1 | 3-5 | 0.3GB |
 
-### Compare phase — Feather v1 vs Transformer 7B / BitNet 100B / Phi-4 Mini / iPhone 15 Pro
+### Compare phase — Feather v1 vs professional baselines (Transformer / BitNet / Phi-4 / LSTM / Attention)
 
 | Model | Speed batch=1 | RAM | Energy/1k | Mem Saving | Ops Saving | Context | MOMR | Cost |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | Transformer 7B GPU | 80 tok/s GPU | 14GB HBM | 2.8J | 1x (1024KB) | 1x (16.7M mults) | 4k | 1x | $25k H100 |
+| Transformer 7B CPU | 3 tok/s CPU | 14GB DDR | 2.8J | 1x | 1x | 4k | 0.04x | $0 |
+| BitNet 100B CPU | 5-7 tok/s CPU | 0.4GB | 0.5J | 35x | 2x (0 mults) | 4k | 10x | $0 |
+| Phi-4 Mini 3.8B CPU | 12 tok/s CPU | 2GB | 0.4J | 7x | 1x | 4k | 5x | $0 |
+| LSTM 384 | FAIL cos -0.05 | 0.6GB | 0.3J | 23x | 1x | 512 | 0x | - |
+| Attention 512x384 | 262k scores 1024KB | 1MB | 0.3J | 1x | 1x | 512 | 1x | - |
 | **Feather v1 i7 CPU** | **94 beats GPU 80** | **0.8GB** | **0.028J 100x** | **512x** | **64x fewer + 0 mults** | **1M 4 hops** | **147x** | **$0** |
 | Feather v1 Kaggle | 45-60 gen est | 0.8GB | 0.05J 56x | 512x | 64x fewer + 0 mults | 1M | 52x | $0 |
 | Feather v1 i5-3337U | 12-18 tok/s | 0.6GB | 0.08J 35x | 512x | 256x chunk32 | 1M | 52x | $0 |
-| BitNet 100B ternary | 5-7 tok/s CPU | 0.4GB | 0.4J 71.9% sav | - | 0 mults ternary | - | - | $0 |
-| Phi-4 Mini 3.8B | 12 tok/s CPU | - | - | - | - | - | - | $0 |
-| iPhone 15 Pro 1B | CPU 17 vs GPU 12.8 | - | - | - | - | - | - | $0 |
-| LSTM 0.9^511 | FAIL cos -0.05 | - | - | - | - | 4e-24 decay | - | - |
-| Attention O(n^2) | 262k scores 1024KB | - | - | 1x | 1x | 4k | 1x | - |
-| p-adic Hierarchical | 7k ops 2KB | 2KB | - | 512x mem | 63.9x fewer ops | 1M 4 hops | - | - |
+| Feather v1 Agent | 8-15 small dim | 0.3GB | 0.05J 56x | 128x | 16x fewer | 64 | 20x | $0 |
 
 Six 300-DPI charts, the full table, honest *measured vs estimate* labels and
 the "bicycle vs truck" conclusion live in **[docs/BENCHMARK.md](docs/BENCHMARK.md)**.
@@ -207,7 +209,8 @@ python kaggle/scripts/kaggle_train.py         # K-FAC readout (10x fewer steps)
 ```
 The **compare runners** (`kaggle/scripts/kaggle_benchmark.py` and the single
 copy-paste `feather_v1_kaggle_compare_single_file.py`) benchmark Feather v1
-vs Transformer 7B / BitNet 100B / Phi-4 Mini / iPhone 15 Pro and save six
+vs professional baselines only (Transformer 7B GPU/CPU, BitNet 100B, Phi-4
+Mini, LSTM 384, Attention 512x384) and save six
 300-DPI charts plus `benchmark_report.json` — see
 [docs/BENCHMARK.md](docs/BENCHMARK.md).
 

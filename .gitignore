@@ -63,6 +63,13 @@ venv.bak/
 *.gguf
 models/
 
+# Release artifacts ARE committed (GGUF + binaries under release/ are the
+# v1.0.0 distribution), so carve them out of the model-file ignore rules.
+!release/v1.0.0/*.gguf
+!release/v1.0.0/*.tar.gz
+!release/v1.0.0/*.whl
+!release/v1.0.0/*.safetensors
+
 # Editors
 .idea/
 .vscode/

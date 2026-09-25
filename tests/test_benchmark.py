@@ -78,12 +78,12 @@ def test_baselines_plus_measured_row_in_comparison():
     names = [r["name"] for r in rows]
     for expected in (
         "Transformer 7B GPU",
-        "BitNet 100B ternary",
+        "Transformer 7B CPU",
+        "BitNet 100B CPU",
         "Phi-4 Mini 3.8B CPU",
-        "iPhone 15 Pro 1B (batch=1)",
-        "Attention O(n^2)",
-        "p-adic Hierarchical",
-        "LSTM exponential 0.9^511",
+        "Attention 512x384",
+        "LSTM 384",
+        "Feather v1 i7-12700 12C CPU",
         "Feather v1 THIS PC (measured)",
     ):
         assert expected in names, expected
@@ -117,8 +117,12 @@ def test_chart_series_has_six_charts():
     speed_labels = [e[0] for e in series["speed"]]
     assert "Feather v1 i7 CPU" in speed_labels
     assert "Feather i5-3337U" in speed_labels
-    assert "iPhone GPU 12.8" in speed_labels
+    assert "Transformer 7B CPU" in speed_labels
+    assert "iPhone" not in " ".join(speed_labels)
     assert any("3337" in label for label in speed_labels)
+    momr_values = {e[0]: e[1] for e in series["momr"]}
+    assert momr_values["Feather i7 CPU"] == 147.0
+    assert momr_values["Feather Agent"] == 20.0
     context_values = [e[1] for e in series["context"]]
     assert 1000000 in context_values
 

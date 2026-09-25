@@ -41,7 +41,7 @@ def convert_pt_to_gguf(
     out_path: str | Path,
     quant: str = DEFAULT_QUANT,
     name: str = "output",
-    author: str = "sunil_sharma_author",
+    author: str = "saurav_bhandari_author",
     description: str = "",
 ) -> Path:
     """Convert npz weights -> quantized GGUF v3 file."""
