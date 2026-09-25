@@ -183,9 +183,10 @@ def main():
     mode = "char" if vocab <= 96 else "byte"
     data = load_wikitext2("train", mode, seq_len, dim)
     chunks = data["chunks"]
-    print(f"Data: {len(chunks)} chunks x {seq_len} = {len(chunks) * seq_len:,} tokens")
+    ids = data["ids"].reshape(-1, seq_len)
+    print(f"Data: {ids.shape[0]} chunks x {seq_len} = {ids.size:,} tokens")
 
-    train_tensors = torch.from_numpy(np.stack(chunks)).long()
+    train_tensors = torch.from_numpy(ids).long()
     train_dataset = torch.utils.data.TensorDataset(
         train_tensors[:, :-1], train_tensors[:, 1:]
     )
@@ -232,7 +233,7 @@ def main():
                 step_losses.append(loss)
             _ = time.perf_counter() - t0
 
-            tok_s = measure_tok_s(model, chunks, min(50, steps), device)
+            tok_s = measure_tok_s(model, ids, min(50, steps), device)
             cpu_tok_s = measure_cpu_tok_s(model, seq_len, vocab, device)
             ram = measure_ram_gb()
             params = count_params(model)
