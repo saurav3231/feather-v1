@@ -147,14 +147,6 @@ def wikitext_lines() -> tuple[list[str], str]:
                 else []
             ),
         ),
-        (
-            "datasets",
-            lambda: [
-                ln["text"]
-                for ln in __import__("datasets")
-                .load_dataset("Salesforce/wikitext", "wikitext-2-raw-v1", split="train")
-            ],
-        ),
     ]
     for name, fn in sources:
         try:
